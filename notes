@@ -1,0 +1,97 @@
+Rules:
+
+Play is divided into a deployment phase and a combat phase:
+  1) Each player takes turns placing stones, until 16 - 24 stones have been placed.
+    The combat phase then begins.
+
+  2) Players alternate moving. A piece may move one square orthogonally or may
+  jump one or more adjacent pieces of either color.
+
+  3) A piece that has two enemy pieces on either side, horizontally or vertically,
+  is blocked and cannot be moved. Flip this piece over, or whatever. If a piece that
+  was capturing an opponents piece itself becomes blocked, the opponents piece
+  becomes freed.
+    -- Captured pieces can assist in capturing themselves (thereby freeing themselves)
+
+  4) Instead of moving, a player may capture a blocked enemy piece.
+
+  5) A piece cannot move between two enemy pieces, unless by doing so one of the
+  enemy pieces is trapped.
+
+  6) A player reduced to one piece loses.
+
+Possible optional rules:
+  -- During deployment, once a minimum number of stones has been placed, either
+  player may choose to not place a stone and move instead (this probably doesn't
+  make sense, given that players are placing stones in sequence)
+
+  -- Allowing some degree of further movement; either throwing a foursided dice
+  and moving a piece that many squares, or being able to move (say) two squares,
+  or full rook move.
+
+  -- Dispensing with the 'check, then capture' thing and just taking when sandwiched
+
+Board is stored in DB as a modified FEN string. Serialized into a 0xBoardLength list.
+Move notation provided as startMove endMove in typical algebraic style, the fn can convert.
+
+Notation:
+Modified FEN.
+Basically, give the moves as single squares for the deploy phase, then as pairs for the movement phase
+
+FEN:
+  color   free  checked
+  white   w     W
+  black   b     B
+
+[position string] [boardWidth] [boardHeight] [activePlayer in w|b] [stoneCount] [gamePhase in d|m] [halfmoveClock] [fullMoveClock]
+
+Position string is the same as a FEN string.
+
+Stone placement: algebraic coordinates of the stone's placement.
+
+Quiet move: algebraic coordinates of origin, destination.
+
+Jump: Algebraic coordinates of start, every square the piece travels through
+
+Check: e4 e5 x d5
+
+Capture: d5+
+
+Okay, frankly, to hell with all of the fancy algebraic notation... Wait a second.
+What if the board is serialized into a dictionary of lists. or a list of lists.
+No, when you serialize the board, do a (width + 1)*(height + 1) array, but store it
+flat b/c that's the easiest thing to do. that removes the need to check if it's on
+the board, which should speed up performance.
+
+Okay, so the engine needs to be able to:
+
+Public API Methods:
+-- Create a game (need two players)
+  -- Initiate an empty game
+    POST /game
+    returns: gameId
+
+  -- Join a game
+    POST /game/<gameID>?<playerId>
+    returns: gameObject
+
+  -- Poll a game
+    GET /game/<gameId>
+    returns gameObject
+
+  -- Handle a move in that game
+    POST /move?<move_start>&<move_end>&<optional getMovesFlag for if you want the response object to include possible moves>
+    returns new gameObject
+
+  -- Get all legal moves in a game
+    GET /move?<gameId>
+    return movesObject (or whatever it'll be called)
+
+Private API Methods:
+  -- serialize / deserialize FEN strings
+
+  -- Check to see if move is legal
+
+  -- Generate move list
+
+  -- Create new FEN from old FEN
