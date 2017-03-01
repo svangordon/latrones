@@ -1,21 +1,17 @@
 import constants
+from constants import sql_templates
+
 
 def create_user(username, email="email@address.com"):
     """ Return an SQL query string to add a user to DB if not exists """
 
-    sql = """INSERT INTO {users_table} (username)
-    SELECT * FROM (SELECT '{username}') AS tmp
-    WHERE NOT EXISTS(
-	   SELECT username FROM {users_table} WHERE username = '{username}'
-   ) LIMIT 1;
-   """.format(users_table=constants.db["users"], username=username)
+    sql = sql_templates["create_user"].format(users_table=constants.db["users"], username=username)
 
     return sql
 
-def get_user(userid):
+def get_user(user_id):
     """ Return SQL string to read user by Id """
 
-    sql = """SELECT * FROM {users_table} WHERE user_id = {userid}
-    """.format(users_table=constants.db['users'], userid=userid)
+    sql = sql_templates["get_user"].format(users_table=constants.db['users'], user_id=user_id)
 
     return sql
