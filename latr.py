@@ -91,10 +91,9 @@ def get_participant(participant_id: hug.types.number):
 def delete_participant(participant_id: hug.types.number):
     cur = cnx.cursor()
     cur.execute(sql_templates["participant"]["delete_participant"].format(participant_id=participant_id, participant_table=constants.db["participant"]))
-    cnx.commit()
-    row = cur.fetchone()
+    # row = cur.fetchone()
     cur.close()
-    return row
+    return 'deleted'
 ###
 # Local Game Handlers
 ###
@@ -108,6 +107,7 @@ def add_game(user_id, board_width=8, board_height=8):
     return added
 
 @hug.local()
+@hug.delete('/game/{game_id}')
 def delete_game(game_id):
     cur = cnx.cursor()
     cur.execute(sql_templates["game"]["delete_game"].format(game_id=game_id, game_table=constants.db["game"]))
@@ -122,7 +122,8 @@ def create_game_handler(user_id, board_width=8, board_height=8, response=None):
     cur = cnx.cursor()
     cur.execute(sql_templates["game"]["create_game"].format(board_width=board_width, board_height=board_height, game_table=constants.db["game"]))
     cur.execute(sql_templates["util"]["last_insert"])
-    game_id = cur.fetchone()[0]
+    # game_id = cur.fetchone()[0]
+    game_id = add_game(user_id, board_width, board_height)
     participant_id = add_participant(user_id, game_id)
     # cur.execute(sql_templates["participant"]["create_participant"].format(user_id=user_id, game_id=game_id, participant_table=constants.db["participant"]))
     # cur.execute(sql_templates["util"]["last_insert"])
@@ -161,24 +162,25 @@ def get_all_games_handler():
     cur.close()
     return row
 
-@hug.delete('/game/{game_id}')
-def delete_game_handler():
-    cur = cnx.cursor()
-    try:
-        cur.execute(sql_templates["delete_game"].format(game_id=game_id, game_table=constants.db["game"]))
-    except MySQLdb.Error as e:
-        return "Could not delete game. {0}".format(e[0])
-    cur.close()
-    return "Game deleted"
+# @hug.local()
+# @hug.delete('/game/{game_id}')
+# def delete_game_handler():
+#     cur = cnx.cursor()
+#     try:
+#         cur.execute(sql_templates["delete_game"].format(game_id=game_id, game_table=constants.db["game"]))
+#     except MySQLdb.Error as e:
+#         return "Could not delete game. {0}".format(e[0])
+#     cur.close()
+#     return "Game deleted"
 
 ###
 # Util Handlers
 ###
 @hug.local()
 def get_last_insert(cur):
-    """ Convenience function for getting last inserted row"""
+    """ Convenience function for getting the id of the last inserted row"""
     # cur = cnx.cursor()
     cur.execute(sql_templates["util"]["last_insert"])
-    row = cur.fetchone()
-    # cur.close()
+    row = cur.fetchone()[0]
+    cur.close()
     return row

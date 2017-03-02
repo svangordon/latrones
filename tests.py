@@ -135,17 +135,17 @@ class TestAddGame(unittest.TestCase):
         self.add_resp = latr.add_game(self.user_id)
 
     def test_exists(self):
-        self.assertIsNotNone(latr.get_game_handler(self.add_resp[0]))
+        self.assertIsNotNone(latr.get_game_handler(self.add_resp))
 
     def test_values(self):
         self.assertEqual
 
     def tearDown(self):
-        latr.delete_game(self.add_resp[0])
+        latr.delete_game(self.add_resp)
 
 class TestDeleteGame(unittest.TestCase):
     def test_participant_gone(self):
-        game = latr.add_game(13)[0]
+        game = latr.add_game(13)
         latr.delete_game(game)
         getResp = latr.get_game_handler(game)
         self.assertIsNone(getResp)
