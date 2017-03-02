@@ -82,6 +82,8 @@ def get_participant(participant_id: hug.types.number):
     cur = cnx.cursor()
     cur.execute(sql_templates["participant"]["get_participant"].format(participant_id=participant_id, participant_table=constants.db["participant"]))
     row = cur.fetchone()
+    if row == None:
+        return None
     cur.close()
     return dict(zip(('participant_id', 'user_id', 'game_id'), row))
 

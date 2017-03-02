@@ -67,13 +67,27 @@ class TestGetGame(unittest.TestCase):
 
 class TestGetParticipant(unittest.TestCase):
     def setUp(self):
+        self.not_found_id = 0
         self.participant_id = 1
         self.getResp = latr.get_participant(self.participant_id)
         self.expected = {"participant_id": 1, "user_id": 13, "game_id": 8}
 
     def test_resp(self):
+        getResp = latr.get_participant(self.participant_id)
         self.assertEqual(self.getResp, self.expected)
+
+    def test_not_found(self):
+        getResp = latr.get_participant(self.not_found_id)
+        self.assertIsNone(getResp)
+
+# class TestDeleteParticipant(unittest.TestCase):
 #
+#     def test_participant_gone(self):
+#         participant = latr.add_participant(1, 1)
+#         latr.delete_participant(participant)
+#         getResp = latr.get_participant(participant)
+#         self.assertEqual
+
 # class TestAddParticipant(unittest.TestCase):
 #     def setUp(self):
 #         self.user_id = 13
