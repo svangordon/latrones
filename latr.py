@@ -6,6 +6,7 @@ import constants
 from constants import sql_templates
 from Users import create_user
 from Users import get_user
+import falcon
 
 cnx = MySQLdb.connect(host="localhost", user="igoinu", passwd="password", db="latr")
 
@@ -15,34 +16,36 @@ cnx = MySQLdb.connect(host="localhost", user="igoinu", passwd="password", db="la
 
 @hug.get('/user')
 def get_all_users():
+    """ Returns all users. """
     cur = cnx.cursor()
     cur.execute(sql_templates["user"]["get_all"].format(users_table=constants.db["users"]))
     rows = cur.fetchall()
     cur.close()
     return rows
 
-@hug.get('/user/{user_id}')
+@hug.get('/user/{user_id}', output=hug.output_format.json)
 def get_user_handler(user_id):
+    """ Returns a single user by id. """
     cur = cnx.cursor()
     cur.execute(sql_templates["get_user"].format(user_id=user_id, users_table=constants.db["users"]))
     row=cur.fetchone()
     cur.close()
-    return row
+    return {'user_id': row[0], 'username': row[1]}
 
 
-@hug.post('/user')
-def create_user_handler(username):
+@hug.post('/user', output=hug.output_format.json)
+def create_user_handler(username, response=None):
     cur = cnx.cursor()
     try:
         cur.execute(sql_templates["create_user"].format(username=username, users_table=constants.db["users"]))
         cnx.commit()
     except MySQLdb.Error as e:
+        response.status = falcon.HTTP_403
         return "Could not add username. {0}".format(e)
-
     cur.execute(sql_templates["get_username"].format(username=username, users_table=constants.db["users"]))
     row = cur.fetchone()
     cur.close()
-    return row
+    return {'user_id': row[0], 'username': row[1]}
 
 @hug.delete('/user/{user_id}')
 def delete_user_handler(user_id):
