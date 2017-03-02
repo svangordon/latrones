@@ -65,26 +65,37 @@ def delete_user_handler(user_id):
 # Game Handlers
 ###
 @hug.post('/game/create', output=hug.output_format.json)
-def create_game_handler(user_id, board_width, board_height):
+def create_game_handler(user_id, board_width=8, board_height=8, response=None):
     """ Create a new game """
     cur = cnx.cursor()
     cur.execute(sql_templates["game"]["create_game"].format(board_width=board_width, board_height=board_height, game_table=constants.db["game"]))
     cur.execute(sql_templates["util"]["last_insert"])
     game_id = cur.fetchone()[0]
     cur.execute(sql_templates["participant"]["create_participant"].format(user_id=user_id, game_id=game_id, participant_table=constants.db["participant"]))
+    cur.execute(sql_templates["util"]["last_insert"])
+    participant_id = cur.fetchone()[0]
     cnx.commit()
-    # row = cur.fetchone()
     cur.close()
-    return {"status": "success", "game_id": game_id}
+    return {"game_id": game_id, "participant_id": participant_id}
 
-@hug.get('/game/get/{user_id}')
-def get_games_handler(user_id):
-    """ Return the id's of all games a player is a participant in """
+@hug.get('/game/{game_id}')
+def get_game_handler(game_id, response=None):
     cur = cnx.cursor()
-    cur.execute(sql_templates["participant"]["get_participant_games"].format(user_id=user_id, participant_table=constants.db["participant"]))
-    row = cur.fetchall()
-    cur.close()
-    return row
+    cur.execute(sql_templates["game"]["get_game_by_id"].format(game_id=game_id, game_table=constants.db["game"]))
+    row = cur.fetchone()
+    if row == None:
+        response.status = falcon.HTTP_404
+        return "game not found"
+    return dict(zip(('game_id', 'start_time', 'board_width', 'board_height'), row))
+
+# @hug.get('/game/{user_id}')
+# def get_games_handler(user_id):
+#     """ Return the id's of all games a player is a participant in """
+#     cur = cnx.cursor()
+#     cur.execute(sql_templates["participant"]["get_participant_games"].format(user_id=user_id, participant_table=constants.db["participant"]))
+#     row = cur.fetchall()
+#     cur.close()
+#     return row
 
 @hug.get('/games')
 def get_all_games_handler():

@@ -19,7 +19,8 @@ sql_templates = {
    "game": {
         "create_game": """INSERT INTO {game_table} (board_width, board_height) VALUES ({board_width}, {board_height})""",
         "delete_game": """DELETE FROM {game_table} WHERE game_id = {game_id}""",
-        "get_all_games": """SELECT * FROM {game_table}"""
+        "get_all_games": """SELECT * FROM {game_table}""",
+        "get_game_by_id": """SELECT * FROM {game_table} WHERE game_id = {game_id}"""
    },
    "participant": {
         "create_participant": """INSERT INTO {participant_table} (game_id, user_id) VALUES ({game_id}, {user_id})""",
