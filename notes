@@ -95,3 +95,22 @@ Private API Methods:
   -- Generate move list
 
   -- Create new FEN from old FEN
+Flow:
+  - Player 1 POST /game to create game
+    - Player 1 starts polling server to wait for match
+  - Player 2 GET /game to get all open games
+  - Player 2 POST(?) /game/{game_id} to join game
+  - Adjust game state
+  - Both players poll the server for game updates, and use POST /move etc to make moves
+
+Tests:
+  - /game
+    -- POST /game
+    -- GET /game/{game_id} and check that it's well formed
+    -- DELETE /game and check that it doesn't exist
+  - /user
+    -- POST /user/username
+    -- GET /user/user_id -- check that it's well formed
+    -- DELETE /user/user_id -- check that it doesn't exist
+  - /participant
+    -- POST /
