@@ -146,7 +146,7 @@ class TestAddGame(unittest.TestCase):
 class TestDeleteGame(unittest.TestCase):
     def test_participant_gone(self):
         game = latr.add_game(13)[0]
-        latr.delete_game(participant)
+        latr.delete_game(game)
         getResp = latr.get_game_handler(game)
         self.assertIsNone(getResp)
 
