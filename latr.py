@@ -94,6 +94,14 @@ def delete_participant(participant_id: hug.types.number):
     # row = cur.fetchone()
     cur.close()
     return 'deleted'
+
+@hug.local()
+def get_participant_by_user(user_id):
+    cur = cnx.cursor()
+    cur.execute(sql_templates["participant"]["get_participant_by_user"].format(user_id=user_id, participant_table=constants.db["participant"]))
+    resp = cur.fetchall()
+    cur.close()
+    return resp
 ###
 # Local Game Handlers
 ###

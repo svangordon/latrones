@@ -150,5 +150,14 @@ class TestDeleteGame(unittest.TestCase):
         getResp = latr.get_game_handler(game)
         self.assertIsNone(getResp)
 
+class TestGetParticipantByUser(unittest.TestCase):
+    def setUp(self):
+        self.user_id = 22
+        self.expected = ((10, 22, 1), (11, 22, 8))
+
+    def test_values(self):
+        self.assertEqual(latr.get_participant_by_user(self.user_id), self.expected)
+
+
 if __name__ == '__main__':
     unittest.main()
