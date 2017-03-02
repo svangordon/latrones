@@ -24,12 +24,15 @@ def get_all_users():
     return rows
 
 @hug.get('/user/{user_id}', output=hug.output_format.json)
-def get_user_handler(user_id):
+def get_user_handler(user_id, response=None):
     """ Returns a single user by id. """
     cur = cnx.cursor()
     cur.execute(sql_templates["get_user"].format(user_id=user_id, users_table=constants.db["users"]))
     row=cur.fetchone()
     cur.close()
+    if row == None:
+        response.status = falcon.HTTP_404
+        return "user not found"
     return {'user_id': row[0], 'username': row[1]}
 
 

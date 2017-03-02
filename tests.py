@@ -15,6 +15,10 @@ class TestGetUserMethods(unittest.TestCase):
     def test_resp_data(self):
         self.assertEqual(self.resp.data, {"user_id": 13, "username": "doggy"})
 
+    def test_bad_id(self):
+        bad_id_resp = hug.test.get(latr, 'user/0')
+        self.assertEqual(bad_id_resp.status, falcon.HTTP_404)
+
 class TestCreateUser(unittest.TestCase):
 
     def setUp(self):
