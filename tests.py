@@ -2,6 +2,7 @@ import hug
 import latr
 import unittest
 import falcon
+from functools import partial
 
 class TestGetUserMethods(unittest.TestCase):
 
@@ -80,22 +81,29 @@ class TestGetParticipant(unittest.TestCase):
         getResp = latr.get_participant(self.not_found_id)
         self.assertIsNone(getResp)
 
-# class TestDeleteParticipant(unittest.TestCase):
-#
-#     def test_participant_gone(self):
-#         participant = latr.add_participant(1, 1)
-#         latr.delete_participant(participant)
-#         getResp = latr.get_participant(participant)
-#         self.assertEqual
+class TestDeleteParticipant(unittest.TestCase):
 
-# class TestAddParticipant(unittest.TestCase):
-#     def setUp(self):
-#         self.user_id = 13
-#         self.game_id = 8
-#         self.addResp = latr.add_participant(self.user_id, self.game_id)
-#
-#     def test_participant_id(self):
-#         self.assertEqual()
+    def test_participant_gone(self):
+        participant = latr.add_participant(13, 1)
+        latr.delete_participant(participant)
+        getResp = latr.get_participant(participant)
+        self.assertIsNone(getResp)
+
+class TestAddParticipant(unittest.TestCase):
+    def setUp(self):
+        self.user_id = 13
+        self.game_id = 8
+        self.add_resp = latr.add_participant(self.user_id, self.game_id)
+        self.expected = (self.user_id, self.game_id)
+        self.returned = ()
+
+    def test_participant_exists(self):
+        self.assertIsNotNone(self.add_resp)
+
+    def test_fk_ids(self):
+        added = latr.get_participant(self.add_resp)
+        returned = (added["user_id"], added["game_id"])
+        self.assertEqual(returned, self.expected)
 
 if __name__ == '__main__':
     unittest.main()

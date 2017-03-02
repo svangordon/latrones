@@ -90,7 +90,7 @@ def get_participant(participant_id: hug.types.number):
 @hug.local()
 def delete_participant(participant_id: hug.types.number):
     cur = cnx.cursor()
-    cur.execute(sql_templates["participant"]["delete_participant"].format(user_id=user_id, game_id=game_id, participant_table=constants.db["participant"]))
+    cur.execute(sql_templates["participant"]["delete_participant"].format(participant_id=participant_id, participant_table=constants.db["participant"]))
     cnx.commit()
     row = cur.fetchone()
     cur.close()
