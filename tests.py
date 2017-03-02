@@ -38,5 +38,18 @@ class TestCreateUser(unittest.TestCase):
     def tearDown(self):
         latr.delete_user_handler(self.resp.data['user_id'])
 
+class TestDeleteUser(unittest.TestCase):
+    def setUp(self):
+        self.test_username = 'test_user'
+        self.createResp = hug.test.post(latr, 'user', {'username': self.test_username})
+        self.deleteResp = hug.test.delete(latr, 'user/{0}'.format(self.createResp.data["user_id"]))
+
+    def test_status_code(self):
+        self.assertEqual(self.deleteResp.status, falcon.HTTP_200)
+
+    def test_user_gone(self):
+        getResp = hug.test.get(latr, 'user/{0}'.format(self.createResp.data["user_id"]))
+        self.assertEqual(getResp.status, falcon.HTTP_404)
+
 if __name__ == '__main__':
     unittest.main()
