@@ -104,7 +104,6 @@ class TestGetParticipant(unittest.TestCase):
         self.assertIsNone(getResp)
 
 class TestDeleteParticipant(unittest.TestCase):
-
     def test_participant_gone(self):
         participant = latr.add_participant(13, 1)
         latr.delete_participant(participant)
@@ -127,6 +126,9 @@ class TestAddParticipant(unittest.TestCase):
         returned = (added["user_id"], added["game_id"])
         self.assertEqual(returned, self.expected)
 
+    def tearDown(self):
+        latr.delete_participant(self.add_resp)
+
 class TestAddGame(unittest.TestCase):
     def setUp(self):
         self.user_id = 13
@@ -137,6 +139,16 @@ class TestAddGame(unittest.TestCase):
 
     def test_values(self):
         self.assertEqual
+
+    def tearDown(self):
+        latr.delete_game(self.add_resp[0])
+
+class TestDeleteGame(unittest.TestCase):
+    def test_participant_gone(self):
+        game = latr.add_game(13)[0]
+        latr.delete_game(participant)
+        getResp = latr.get_game_handler(game)
+        self.assertIsNone(getResp)
 
 if __name__ == '__main__':
     unittest.main()
