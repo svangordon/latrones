@@ -51,5 +51,19 @@ class TestDeleteUser(unittest.TestCase):
         getResp = hug.test.get(latr, 'user/{0}'.format(self.createResp.data["user_id"]))
         self.assertEqual(getResp.status, falcon.HTTP_404)
 
+class TestGetGame(unittest.TestCase):
+    def setUp(self):
+        self.test_game = 1
+        self.getResp = hug.test.get(latr, 'game/{0}'.format(self.test_game))
+
+    def test_status_code(self):
+        self.assertEqual(self.getResp.status, falcon.HTTP_200)
+
+    def test_height(self):
+        self.assertEqual(self.getResp.data["board_height"], 8)
+
+    def test_width(self):
+        self.assertEqual(self.getResp.data["board_width"], 8)
+
 if __name__ == '__main__':
     unittest.main()
