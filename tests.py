@@ -65,5 +65,23 @@ class TestGetGame(unittest.TestCase):
     def test_width(self):
         self.assertEqual(self.getResp.data["board_width"], 8)
 
+class TestGetParticipant(unittest.TestCase):
+    def setUp(self):
+        self.participant_id = 1
+        self.getResp = latr.get_participant(self.participant_id)
+        self.expected = {"participant_id": 1, "user_id": 13, "game_id": 8}
+
+    def test_resp(self):
+        self.assertEqual(self.getResp, self.expected)
+#
+# class TestAddParticipant(unittest.TestCase):
+#     def setUp(self):
+#         self.user_id = 13
+#         self.game_id = 8
+#         self.addResp = latr.add_participant(self.user_id, self.game_id)
+#
+#     def test_participant_id(self):
+#         self.assertEqual()
+
 if __name__ == '__main__':
     unittest.main()

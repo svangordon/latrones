@@ -62,6 +62,38 @@ def delete_user_handler(user_id):
     return "Operation successful"
 
 ###
+# Participant Handlers
+###
+@hug.local()
+def add_participant(user_id: hug.types.number, game_id: hug.types.number):
+    """ Creates a participant and returns the participant id """
+    # ??? does this having a side-effect make it overloaded?
+    cur = cnx.cursor()
+    cur.execute(sql_templates["participant"]["create_participant"].format(user_id=user_id, game_id=game_id, participant_table=constants.db["participant"]))
+    cur.execute(sql_templates["util"]["last_insert"])
+    cnx.commit()
+    row = cur.fetchone()[0]
+    cur.close()
+    return row
+
+@hug.local()
+def get_participant(participant_id: hug.types.number):
+    """ Returns a participant dict """
+    cur = cnx.cursor()
+    cur.execute(sql_templates["participant"]["get_participant"].format(participant_id=participant_id, participant_table=constants.db["participant"]))
+    row = cur.fetchone()
+    cur.close()
+    return dict(zip(('participant_id', 'user_id', 'game_id'), row))
+
+@hug.local()
+def delete_participant(participant_id: hug.types.number):
+    cur = cnx.cursor()
+    cur.execute(sql_templates["participant"]["delete_participant"].format(user_id=user_id, game_id=game_id, participant_table=constants.db["participant"]))
+    cnx.commit()
+    row = cur.fetchone()
+    cur.close()
+    return row
+###
 # Game Handlers
 ###
 @hug.post('/game/create', output=hug.output_format.json)
@@ -71,9 +103,10 @@ def create_game_handler(user_id, board_width=8, board_height=8, response=None):
     cur.execute(sql_templates["game"]["create_game"].format(board_width=board_width, board_height=board_height, game_table=constants.db["game"]))
     cur.execute(sql_templates["util"]["last_insert"])
     game_id = cur.fetchone()[0]
-    cur.execute(sql_templates["participant"]["create_participant"].format(user_id=user_id, game_id=game_id, participant_table=constants.db["participant"]))
-    cur.execute(sql_templates["util"]["last_insert"])
-    participant_id = cur.fetchone()[0]
+    participant_id = add_participant(user_id, game_id)
+    # cur.execute(sql_templates["participant"]["create_participant"].format(user_id=user_id, game_id=game_id, participant_table=constants.db["participant"]))
+    # cur.execute(sql_templates["util"]["last_insert"])
+    # participant_id = cur.fetchone()[0]
     cnx.commit()
     cur.close()
     return {"game_id": game_id, "participant_id": participant_id}

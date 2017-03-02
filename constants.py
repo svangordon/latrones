@@ -24,7 +24,9 @@ sql_templates = {
    },
    "participant": {
         "create_participant": """INSERT INTO {participant_table} (game_id, user_id) VALUES ({game_id}, {user_id})""",
-        "get_participant_games": """SELECT * FROM {participant_table} where user_id = {user_id}"""
+        "get_participant_games": """SELECT * FROM {participant_table} where user_id = {user_id}""",
+        "delete_participant": """DELETE FROM {participant_table} WHERE participant_id = {participant_id}""",
+        "get_participant": """SELECT * FROM {participant_table} WHERE participant_id = {participant_id}"""
     },
     "util": {
         "last_insert": """SELECT LAST_INSERT_ID();"""
