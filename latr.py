@@ -96,7 +96,25 @@ def delete_participant(participant_id: hug.types.number):
     cur.close()
     return row
 ###
-# Game Handlers
+# Local Game Handlers
+###
+@hug.local()
+def add_game(user_id, board_width=8, board_height=8):
+    """ Insert a new game row, and return its id """
+    cur = cnx.cursor()
+    cur.execute(sql_templates["game"]["create_game"].format(user_id=user_id, board_width=board_width, board_height=board_height, game_table=constants.db["game"]))
+    cnx.commit()
+    added = get_last_insert(cur)
+    return added
+
+@hug.local()
+def delete_game(game_id):
+    cur = cnx.cursor()
+    cur.execute(sql_templates["game"]["delete_game"].format(game_id=game_id, game_table=constants.db["game"]))
+    return True
+
+###
+# External Game Handlers
 ###
 @hug.post('/game/create', output=hug.output_format.json)
 def create_game_handler(user_id, board_width=8, board_height=8, response=None):
@@ -113,14 +131,17 @@ def create_game_handler(user_id, board_width=8, board_height=8, response=None):
     cur.close()
     return {"game_id": game_id, "participant_id": participant_id}
 
+@hug.local()
 @hug.get('/game/{game_id}')
 def get_game_handler(game_id, response=None):
     cur = cnx.cursor()
     cur.execute(sql_templates["game"]["get_game_by_id"].format(game_id=game_id, game_table=constants.db["game"]))
     row = cur.fetchone()
     if row == None:
-        response.status = falcon.HTTP_404
-        return "game not found"
+        if response:
+            response.status = falcon.HTTP_404
+            return "game not found"
+        return None
     return dict(zip(('game_id', 'start_time', 'board_width', 'board_height'), row))
 
 # @hug.get('/game/{user_id}')
@@ -149,3 +170,15 @@ def delete_game_handler():
         return "Could not delete game. {0}".format(e[0])
     cur.close()
     return "Game deleted"
+
+###
+# Util Handlers
+###
+@hug.local()
+def get_last_insert(cur):
+    """ Convenience function for getting last inserted row"""
+    # cur = cnx.cursor()
+    cur.execute(sql_templates["util"]["last_insert"])
+    row = cur.fetchone()
+    # cur.close()
+    return row

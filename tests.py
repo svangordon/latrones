@@ -2,6 +2,7 @@ import hug
 import latr
 import unittest
 import falcon
+import datetime
 from functools import partial
 
 class TestGetUserMethods(unittest.TestCase):
@@ -54,17 +55,38 @@ class TestDeleteUser(unittest.TestCase):
 
 class TestGetGame(unittest.TestCase):
     def setUp(self):
+        def bound_handler(game_id):
+            def partial():
+                return hug.test.get(latr, 'game/{0}'.format(game_id))
+        self.expected = {
+            "board_height": 8,
+            "board_width": 8,
+            "game_id": 1,
+            "start_time": datetime.datetime(2017, 3, 1, 16, 55, 57)
+        }
         self.test_game = 1
+        self.fn = bound_handler(self.test_game)
         self.getResp = hug.test.get(latr, 'game/{0}'.format(self.test_game))
 
-    def test_status_code(self):
-        self.assertEqual(self.getResp.status, falcon.HTTP_200)
+    def test_http_exists(self):
+        get_resp = hug.test.get(latr, 'game/{0}'.format(self.test_game))
+        self.assertIsNotNone(get_resp)
 
-    def test_height(self):
-        self.assertEqual(self.getResp.data["board_height"], 8)
+    def test_http_status_code(self):
+        get_resp = hug.test.get(latr, 'game/{0}'.format(self.test_game))
+        self.assertEqual(get_resp.status, falcon.HTTP_200)
 
-    def test_width(self):
-        self.assertEqual(self.getResp.data["board_width"], 8)
+    def test_http_value(self):
+        get_resp = hug.test.get(latr, 'game/{0}'.format(self.test_game))
+        self.assertEqual(get_resp.data, self.expected)
+
+    def test_local_exists(self):
+        get_resp = latr.get_game_handler(self.test_game)
+        self.assertIsNotNone(get_resp)
+
+    def test_http_value(self):
+        get_resp = get_resp = latr.get_game_handler(self.test_game)
+        self.assertEqual(get_resp, self.expected)
 
 class TestGetParticipant(unittest.TestCase):
     def setUp(self):
@@ -104,6 +126,17 @@ class TestAddParticipant(unittest.TestCase):
         added = latr.get_participant(self.add_resp)
         returned = (added["user_id"], added["game_id"])
         self.assertEqual(returned, self.expected)
+
+class TestAddGame(unittest.TestCase):
+    def setUp(self):
+        self.user_id = 13
+        self.add_resp = latr.add_game(self.user_id)
+
+    def test_exists(self):
+        self.assertIsNotNone(latr.get_game_handler(self.add_resp[0]))
+
+    def test_values(self):
+        self.assertEqual
 
 if __name__ == '__main__':
     unittest.main()
