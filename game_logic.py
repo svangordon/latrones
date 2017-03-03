@@ -49,8 +49,6 @@ def validate_jump(start_coord, jumped_coord, end_coord, game_object):
     end_square = game_object["board"][end_coord]
     row_len = game_object["board_width"] + 2
 
-    # print(start_square)
-
     # if jump is backwards or jumping piece is checked, jumped piece must be friendly
     if (is_backwards(start_coord, jumped_coord, game_object["active_player"], game_object["board_width"]) \
         or start_square["checked"]) and \
@@ -60,4 +58,4 @@ def validate_jump(start_coord, jumped_coord, end_coord, game_object):
         (start_coord == jumped_coord -1 and start_coord == end_coord -2) or \
         (start_coord == jumped_coord - row_len and start_coord == end_coord - row_len*2) or \
         (start_coord == jumped_coord + row_len and start_coord == end_coord + row_len*2)
-    return coord_valid and jumped_square["owner"] != -1 and (dest_square["checked"] or dest_square["owner"] == -1) and end_square["valid"] == True
+    return coord_valid and jumped_square["owner"] != -1 and (end_square["checked"] or end_square["owner"] == -1) and end_square["valid"] == True

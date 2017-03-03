@@ -60,7 +60,7 @@ class TestDeserializeRow(unittest.TestCase):
         self.assertEqual(len(self.expected), len(fen.deserialize_row(self.input)))
 
     def test_two_digits(self):
-        self.assertEqual(len(self.fn('12')), 12)
+        self.assertEqual(len(self.fn('12')), 14)
 
 class TestDeserializeBoardString(unittest.TestCase):
     def setUp(self):
@@ -89,7 +89,6 @@ class TestDeserializeFenString(unittest.TestCase):
 
     def test_non_empty(self):
         board = fen.deserialize_fen_string(self.non_empty_board)
-        print(board["board_width"], board["board_height"])
         self.assertEqual(len(board["board"]), 140)
 
 class TestCharConversion(unittest.TestCase):
