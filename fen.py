@@ -84,3 +84,16 @@ def generate_square(char=None):
     if char.isupper():
         output["checked"] = True
     return output
+
+def generate_char(square):
+    if not square["valid"]:
+        return ''
+    if not square.occupied:
+        return '1' #down the line we'll reduce all the nums
+    output = ''
+    if square["owner"] == [0]:
+        output = 'w'
+    else output = 'b'
+    if square["checked"]:
+        output = output.upper()
+    return output

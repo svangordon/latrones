@@ -68,5 +68,12 @@ class TestDeserializeFenString(unittest.TestCase):
     def test_empty_board(self):
         returned_empty_board = fen.deserialize_fen_string(fen.create_fen(8,12))
 
+class TestCharConversion(unittest.TestCase):
+    def test_convert_w(self):
+        self.assertEqual('w', fen.generate_char(fen.generate_square('w')))
+
+    def test_convert_empty(self):
+        self.assertEqual('1', fen.generate_char(fen.generate_square()))
+
 if __name__ == '__main__':
     unittest.main()
