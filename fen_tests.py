@@ -25,5 +25,13 @@ class TestCharGenerator(unittest.TestCase):
     def test_values(self):
         self.assertListEqual(self.expected, list(map(fen.char_generator, self.input)))
 
+class TestDeserializeChar(unittest.TestCase):
+    def setUp(self):
+        self.input = [3, 'w', 'W', 'b', 'B']
+        self.expected = [[{'occupied': False, 'valid': True, 'owner': -1, 'checked': False}, {'occupied': False, 'valid': True, 'owner': -1, 'checked': False}, {'occupied': False, 'valid': True, 'owner': -1, 'checked': False}], [{'occupied': True, 'valid': True, 'owner': 0, 'checked': False}], [{'occupied': True, 'valid': True, 'owner': 0, 'checked': True}], [{'occupied': True, 'valid': True, 'owner': 1, 'checked': False}], [{'occupied': True, 'valid': True, 'owner': 1, 'checked': True}]]
+
+    def test_values(self):
+        self.assertListEqual(self.expected, list(map(fen.deserialize_char, self.input)))
+
 if __name__ == '__main__':
     unittest.main()

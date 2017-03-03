@@ -22,8 +22,15 @@ def create_fen(board_width, board_height):
 #         output_row.extend(deserialize_char(char))
 #     return output_row
 #
-# def deserialize_char(char_input):
-#     try:
+def deserialize_char(char_input):
+    """ Should never be passed -1, I don't think """
+    if char_input == str(-1):
+        raise TypeError("deserialize_char passed -1")
+    try:
+        return int(char_input) * [char_generator(None)]
+    except ValueError as e:
+        return [char_generator(char_input)]
+
 
 def char_generator(char=None):
     """ Pass -1 for non-valid squares """
