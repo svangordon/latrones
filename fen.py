@@ -20,6 +20,7 @@ def deserialize_row(row_input):
     output_row = [char_generator(-1)]
     for char in list(row_input):
         output_row.extend(deserialize_char(char))
+    output_row.extend([char_generator(-1)])
     return output_row
 
 def deserialize_char(char_input):

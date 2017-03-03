@@ -36,7 +36,7 @@ class TestDeserializeChar(unittest.TestCase):
 class TestDeserializeRow(unittest.TestCase):
     def setUp(self):
         self.input = "1wW1bB3"
-        self.expected = [{'valid': False, 'owner': -1, 'checked': False, 'occupied': False}, {'valid': True, 'owner': -1, 'checked': False, 'occupied': False}, {'valid': True, 'owner': 0, 'checked': False, 'occupied': True}, {'valid': True, 'owner': 0, 'checked': True, 'occupied': True}, {'valid': True, 'owner': -1, 'checked': False, 'occupied': False}, {'valid': True, 'owner': 1, 'checked': False, 'occupied': True}, {'valid': True, 'owner': 1, 'checked': True, 'occupied': True}, {'valid': True, 'owner': -1, 'checked': False, 'occupied': False}, {'valid': True, 'owner': -1, 'checked': False, 'occupied': False}, {'valid': True, 'owner': -1, 'checked': False, 'occupied': False}]
+        self.expected = [{'checked': False, 'valid': False, 'occupied': False, 'owner': -1}, {'checked': False, 'valid': True, 'occupied': False, 'owner': -1}, {'checked': False, 'valid': True, 'occupied': True, 'owner': 0}, {'checked': True, 'valid': True, 'occupied': True, 'owner': 0}, {'checked': False, 'valid': True, 'occupied': False, 'owner': -1}, {'checked': False, 'valid': True, 'occupied': True, 'owner': 1}, {'checked': True, 'valid': True, 'occupied': True, 'owner': 1}, {'checked': False, 'valid': True, 'occupied': False, 'owner': -1}, {'checked': False, 'valid': True, 'occupied': False, 'owner': -1}, {'checked': False, 'valid': True, 'occupied': False, 'owner': -1}, {'checked': False, 'valid': False, 'occupied': False, 'owner': -1}]
 
     def test_values(self):
         self.assertListEqual(fen.deserialize_row(self.input), self.expected)
