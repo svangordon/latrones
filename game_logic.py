@@ -1,10 +1,5 @@
 from string import ascii_lowercase
 
-# def validate_move(game_object, move_to, move_from=None):
-#     """ Return Bool for whether a given move is legal """
-#     if move_from is not None and game_object["gamePhase"] != 'm'
-#             return False
-#     elif move_from is not None game_object["gamePhase"] == 'd
 
 def convert_alg_to_point(coord, board_width, board_height):
     col = int(ascii_lowercase.find(coord[0])) + 1 # dummy col
@@ -24,3 +19,9 @@ def convert_point_to_alg(coord, board_width, board_height):
     col = coord%(board_width + 2) - 1
     row = int(coord / (board_width + 2))
     return ascii_lowercase[col] + str(row)
+
+def validate_move(game_object, move_from, move_to):
+    """ Return Bool for whether a given move is legal """
+    origin_point = convert_alg_to_point(move_from, game_object["board_width"])
+    origin = (convert_alg_to_point)
+    # Check to make sure
