@@ -9,14 +9,14 @@ def create_fen(board_width=12, board_height=8):
 
 def deserialize_fen_string(fen_input:str):
     """ Return a dict representing the FEN for python """
-    columns = ('board_string', 'board_width', 'board_height', 'active_player', 'stone_count', 'half_move_clock', 'full_move_clock')
+    columns = ('board', 'board_width', 'board_height', 'active_player', 'stone_count', 'half_move_clock', 'full_move_clock')
     def fen_map(chunk):
         try:
             return int(chunk)
         except (ValueError, TypeError):
             return chunk
     fen_dict = dict(zip(columns, map(fen_map, fen_input.split(' '))))
-    fen_dict['board_string'] = deserialize_board_string(fen_dict["board_string"])
+    fen_dict['board'] = deserialize_board_string(fen_dict["board"])
     return fen_dict
     # fen_dict["board_string"] = deserialize_board_string(fen_dict["board_string"])
     # fen_dict["board_width"] = int(fen_dict["board_width"])
@@ -108,8 +108,8 @@ def generate_char(square):
 
 def serialize_fen_string(fen_object):
     # [position string] [board_width] [board_height] [active_player in w|b] [stone_count] [gamePhase in d|m] [half_move_clock] [full_move_clock]
-    fen_template = Template("$board_string $board_width $board_height $active_player $stone_count $half_move_clock $full_move_clock")
-    fen_object["board_string"] = serialize_board_string(fen_object["board_string"])
+    fen_template = Template("$board $board_width $board_height $active_player $stone_count $half_move_clock $full_move_clock")
+    fen_object["board"] = serialize_board_string(fen_object["board"])
     return fen_template.substitute(fen_object)
 
 def serialize_board_string(board_list):

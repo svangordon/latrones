@@ -22,6 +22,7 @@ def convert_point_to_alg(coord, board_width, board_height):
 
 def validate_move(game_object, move_from, move_to):
     """ Return Bool for whether a given move is legal """
-    origin_point = convert_alg_to_point(move_from, game_object["board_width"])
-    origin = (convert_alg_to_point)
+    board_dim = (game_object["board_width"], game_object["board_height"])
+    origin_point = convert_alg_to_point(move_from, *board_dim)
+    origin_square = game_object["board"]
     # Check to make sure
