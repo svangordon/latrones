@@ -88,12 +88,15 @@ def generate_square(char=None):
 def generate_char(square):
     if not square["valid"]:
         return ''
-    if not square.occupied:
+    if not square["occupied"]:
         return '1' #down the line we'll reduce all the nums
     output = ''
-    if square["owner"] == [0]:
+    if square["owner"] == 0:
         output = 'w'
-    else output = 'b'
+    elif square["owner"] == 1:
+        output = 'b'
+    else:
+        raise ValueError('invalid owner value')
     if square["checked"]:
         output = output.upper()
     return output

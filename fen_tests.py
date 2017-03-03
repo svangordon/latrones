@@ -10,7 +10,7 @@ class TestCreateFen(unittest.TestCase):
     def test_value(self):
         self.assertEqual(fen.create_fen(self.board_width, self.board_height), self.expected)
 
-class TestCharGenerator(unittest.TestCase):
+class TestGenerateSquare(unittest.TestCase):
     def setUp(self):
         self.input = [-1, 'w', 'W', 'b', 'B', None]
         self.expected = [
@@ -23,7 +23,20 @@ class TestCharGenerator(unittest.TestCase):
         ]
 
     def test_values(self):
-        self.assertListEqual(self.expected, list(map(fen.char_generator, self.input)))
+        self.assertListEqual(self.expected, list(map(fen.generate_square, self.input)))
+
+class TestGenerateChar(unittest.TestCase):
+    def setUp(self):
+        self.input = [{'owner': -1, 'occupied': False, 'valid': False, 'checked': False},
+        {'owner': 0, 'valid': True, 'occupied': True, 'checked': False},
+        {'valid': True, 'occupied': True, 'owner': 0, 'checked': True},
+        {'owner': 1, 'valid': True, 'checked': False, 'occupied': True},
+        {'checked': True, 'valid': True, 'occupied': True, 'owner': 1},
+        {'owner': -1, 'valid': True, 'checked': False, 'occupied': False}]
+        self.expected = ['', 'w', 'W', 'b', 'B', '1']
+
+    def test_values(self):
+        self.assertListEqual(self.expected, list(map(fen.generate_char, self.input)))
 
 class TestDeserializeChar(unittest.TestCase):
     def setUp(self):
