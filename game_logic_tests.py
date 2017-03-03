@@ -111,5 +111,28 @@ class TestIsMoveBackwards(unittest.TestCase):
         for test in tests:
             self.assertEqual(test[0], self.fn(*test[1]))
 
+class TestValidateJump(unittest.TestCase):
+    def setUp(self):
+        self.fn = game_logic.validate_jump
+        self.valid_fen = "12/12/3w8/3wb7/3w8/3B8/12/12 12 8 b 0 0 1"
+        self.valid_dict = fen.deserialize_fen_string(self.valid_fen)
+
+    # def test_valid_jumps(self):
+    #     start = 60
+    #     jump_coords = [(60, 61, 62), (60, 46, 32), (60, 74, 98)]
+    #     # jump_coords = [(45, 59, 73)]
+    #     # print(self.valid_dict["board"])
+    #     for coord in jump_coords:
+    #         # print(coord)
+    #         self.assertTrue(self.fn(*coord, self.valid_dict))
+
+    def test_valid_setup(self):
+        print(len(self.valid_dict["board"]))
+        # for i in range(len(self.valid_dict["board"])):
+        #     print(i, self.valid_dict["board"][i]["owner"])
+        # self.assertEqual(self.valid_dict["board"][45]["owner"], 0)
+
+
+
 if __name__ == '__main__':
     unittest.main()

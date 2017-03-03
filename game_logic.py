@@ -39,3 +39,25 @@ def is_backwards(move_start, move_end, active_player, board_width):
     """ Return whether a given move is backwards. Only interested in whether it is a single step backwards """
     step = -(board_width+2) if active_player == 0 else board_width+2
     return move_start + step == move_end
+
+def validate_jump(start_coord, jumped_coord, end_coord, game_object):
+    """ Return whether a given jump is valid; only looks at the direction. If it is
+    a backwards move or jumping piece is checked, checks that jumped piece is friendly.
+    Only checks one jump, use multiple calls to check multiple jumps in a turn"""
+    start_square = game_object["board"][start_coord]
+    jumped_square = game_object["board"][jumped_coord]
+    end_square = game_object["board"][end_coord]
+    row_len = game_object["board_width"] + 2
+
+    # print(start_square)
+
+    # if jump is backwards or jumping piece is checked, jumped piece must be friendly
+    if (is_backwards(start_coord, jumped_coord, game_object["active_player"], game_object["board_width"]) \
+        or start_square["checked"]) and \
+        not start_square["owner"] == jumped_square["owner"]:
+            return False
+    coord_valid = (start_coord == jumped_coord + 1 and start_coord == end_coord + 2) or \
+        (start_coord == jumped_coord -1 and start_coord == end_coord -2) or \
+        (start_coord == jumped_coord - row_len and start_coord == end_coord - row_len*2) or \
+        (start_coord == jumped_coord + row_len and start_coord == end_coord + row_len*2)
+    return coord_valid and jumped_square["owner"] != -1 and (dest_square["checked"] or dest_square["owner"] == -1) and end_square["valid"] == True
