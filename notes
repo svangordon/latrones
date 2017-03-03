@@ -133,3 +133,5 @@ squares look like:
   -- Possibly, no jumping backwards over enemy pieces
   -- maybe boardwidth-2 pieces?
   -- Major change w/o historical basis: any piece can be captured by displacement if it borders 2 enemy stones
+
+  Decision: No deployment phase.
