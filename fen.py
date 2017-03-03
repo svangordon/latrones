@@ -2,7 +2,7 @@
 
 from string import Template
 
-def create_fen(board_width, board_height):
+def create_fen(board_width=12, board_height=8):
     # [position string] [boardWidth] [boardHeight] [activePlayer in w|b] [stoneCount] [gamePhase in d|m] [halfmoveClock] [fullMoveClock]
     position_string = '/'.join([str(board_width)] * board_height)
     return Template("$position_string $board_width $board_height w 0 0 1").substitute(locals())

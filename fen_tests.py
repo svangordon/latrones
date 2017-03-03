@@ -1,5 +1,6 @@
 import fen
 import unittest
+from random import randint
 
 class TestCreateFen(unittest.TestCase):
     def setUp(self):
@@ -97,8 +98,17 @@ class TestSerializeBoardString(unittest.TestCase):
         self.assertEqual(self.expected_empty_board, fen.serialize_board_string(self.empty_board_input))
 
 class TestSerializeFenString(unittest.TestCase):
+    def setUp(self):
+        self.empty_8_by_12 = "8/8/8/8/8/8/8/8/8/8/8/8 8 12 w 0 0 1"
+
     def test_empty_board(self):
-        self.assertEqual(fen.create_fen(8, 12), fen.serialize_fen_string(fen.deserialize_fen_string(fen.create_fen(8,12))))
+        self.assertEqual(self.empty_8_by_12, fen.serialize_fen_string(fen.deserialize_fen_string(fen.create_fen(8,12))))
+
+    def test_empty_row_count(self):
+        random_width = randint(8,13)
+        random_height = randint(8,13)
+        returned_board = fen.serialize_fen_string(fen.deserialize_fen_string(fen.create_fen(random_width, random_height)))
+        self.assertEqual( returned_board.count('/') + 1, random_height)
 
 if __name__ == '__main__':
     unittest.main()
