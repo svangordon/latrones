@@ -7,7 +7,7 @@ def create_fen(board_width, board_height):
     position_string = '/'.join([str(board_width)] * board_height)
     return Template("$position_string $board_width $board_height w 0 d 0 1").substitute(locals())
 
-def deserialize_fen(fen_input:str):
+def deserialize_fen_string(fen_input:str):
     """ Return a dict representing the FEN for python """
     columns = ('boardString', 'boardWidth', 'boardHeight', 'activePlayer', 'stoneCount', 'gamePhase', 'halfmoveClock', 'fullMoveClock')
     def fen_map(chunk):
@@ -35,7 +35,7 @@ def deserialize_board_string(fen_input:str):
     # print(board_width)
 
     output_board = [char_generator(-1)] * board_width
-    output_board.extend(map(deserialize_row, fen_input.split('/')))
+    output_board.extend([item for sublist in map(deserialize_row, fen_input.split('/')) for item in sublist])
     output_board.extend([char_generator(-1)] * board_width)
 
     return output_board
