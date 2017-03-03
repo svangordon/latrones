@@ -7,21 +7,43 @@ def create_fen(board_width, board_height):
     position_string = '/'.join([str(board_width)] * board_height)
     return Template("$position_string $board_width $board_height w 0 d 0 1").substitute(locals())
 
-def deserialize_fen_string(fen_input:str):
+def deserialize_fen(fen_input:str):
+    """ Return a dict representing the FEN for python """
+    columns = ('boardString', 'boardWidth', 'boardHeight', 'activePlayer', 'stoneCount', 'gamePhase', 'halfmoveClock', 'fullMoveClock')
+    def fen_map(chunk):
+        try:
+            return int(chunk)
+        except (ValueError, TypeError):
+            return chunk
+    fen_dict = dict(zip(columns, map(fen_map, fen_input.split(' '))))
+    fen_dict['boardString'] = deserialize_board_string(fen_dict["boardString"])
+    return fen_dict
+    # fen_dict["boardString"] = deserialize_board_string(fen_dict["boardString"])
+    # fen_dict["boardWidth"] = int(fen_dict["boardWidth"])
+    # fen_dict["boardHeight"] = int(fen_dict["boardHeight"])
+    # fen_dict["activePlayer"] = int(fen_dict["activePlayer"])
+
+def deserialize_board_string(fen_input:str):
     """ Return a list of dicts representing the game board"""
-    fen_dict = dict(zip(('boardString', 'boardWidth', 'boardHeight', 'activePlayer', 'stoneCount', 'gamePhase', 'halfmoveClock', 'fullMoveClock') ,fen_input.split(' ')))
-    # input_board = fen.split(' ')[0].split('/')
-    output_board = [char_generator(-1)] * int(fen_dict["boardWidth"])
+    # fen_dict = dict(zip(('boardString', 'boardWidth', 'boardHeight', 'activePlayer', 'stoneCount', 'gamePhase', 'halfmoveClock', 'fullMoveClock') ,fen_input.split(' ')))
+    board_width = 2 # add one on each side
+    for char in fen_input.split('/')[0]:
+        try:
+            board_width += int(char)
+        except ValueError:
+            board_width += 1
+    # print(board_width)
 
-    output_board.extend(map(deserialize_row, fen_dict["boardString"].split('/')))
-
-    output_board.extend([char_generator(-1)] * int(fen_dict["boardWidth"]))
+    output_board = [char_generator(-1)] * board_width
+    output_board.extend(map(deserialize_row, fen_input.split('/')))
+    output_board.extend([char_generator(-1)] * board_width)
 
     return output_board
 
 def deserialize_row(row_input):
     output_row = [char_generator(-1)]
-    for char in list(row_input):
+    # print(len(row_input))
+    for char in row_input:
         output_row.extend(deserialize_char(char))
     output_row.extend([char_generator(-1)])
     return output_row
@@ -33,11 +55,13 @@ def deserialize_char(char_input):
     try:
         return int(char_input) * [char_generator(None)]
     except ValueError as e:
+        # print('received {0}'.format(char_input))
         return [char_generator(char_input)]
 
 
 def char_generator(char=None):
     """ Pass -1 for non-valid squares """
+    # print('char_generator received', char)
     output = {
         "occupied": False,
         "checked": False,
@@ -55,7 +79,7 @@ def char_generator(char=None):
     elif char.lower() == 'b':
         output["owner"] = 1
     else:
-        raise ValueError('invalid char')
+        raise ValueError('invalid char ', char)
 
     if char.isupper():
         output["checked"] = True
