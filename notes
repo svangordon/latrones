@@ -43,7 +43,7 @@ FEN:
   white   w     W
   black   b     B
 
-[position string] [boardWidth] [boardHeight] [activePlayer in w|b] [stoneCount] [gamePhase in d|m] [halfmoveClock] [fullMoveClock]
+[position string] [board_width] [board_height] [active_player in w|b] [stone_count] [gamePhase in d|m] [half_move_clock] [full_move_clock]
 
 Position string is the same as a FEN string.
 
@@ -131,7 +131,7 @@ squares look like:
   -- Pieces can only move backwards by jumping (might remove need for checking at all)
   -- side of the board (possibly player's edges?) counts as a piece for checking
   -- Possibly, no jumping backwards over enemy pieces
-  -- maybe boardwidth-2 pieces?
+  -- maybe board_width-2 pieces?
   -- Major change w/o historical basis: any piece can be captured by displacement if it borders 2 enemy stones
 
   Decision: No deployment phase.
