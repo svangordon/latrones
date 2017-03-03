@@ -3,7 +3,6 @@ import latr
 import unittest
 import falcon
 import datetime
-from functools import partial
 
 class TestGetUserMethods(unittest.TestCase):
 
@@ -55,9 +54,6 @@ class TestDeleteUser(unittest.TestCase):
 
 class TestGetGame(unittest.TestCase):
     def setUp(self):
-        def bound_handler(game_id):
-            def partial():
-                return hug.test.get(latr, 'game/{0}'.format(game_id))
         self.expected = {
             "board_height": 8,
             "board_width": 8,
@@ -65,7 +61,6 @@ class TestGetGame(unittest.TestCase):
             "start_time": datetime.datetime(2017, 3, 1, 16, 55, 57)
         }
         self.test_game = 1
-        self.fn = bound_handler(self.test_game)
         self.getResp = hug.test.get(latr, 'game/{0}'.format(self.test_game))
 
     def test_http_exists(self):
