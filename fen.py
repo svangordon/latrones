@@ -16,12 +16,12 @@ def create_fen(board_width, board_height):
 #         for char in row:
 #             if
 #
-# def deserialize_row(row_input):
-#     output_row = []
-#     for char in row_input:
-#         output_row.extend(deserialize_char(char))
-#     return output_row
-#
+def deserialize_row(row_input):
+    output_row = [char_generator(-1)]
+    for char in list(row_input):
+        output_row.extend(deserialize_char(char))
+    return output_row
+
 def deserialize_char(char_input):
     """ Should never be passed -1, I don't think """
     if char_input == str(-1):

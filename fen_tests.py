@@ -33,5 +33,13 @@ class TestDeserializeChar(unittest.TestCase):
     def test_values(self):
         self.assertListEqual(self.expected, list(map(fen.deserialize_char, self.input)))
 
+class TestDeserializeRow(unittest.TestCase):
+    def setUp(self):
+        self.input = "1wW1bB3"
+        self.expected = [{'valid': False, 'owner': -1, 'checked': False, 'occupied': False}, {'valid': True, 'owner': -1, 'checked': False, 'occupied': False}, {'valid': True, 'owner': 0, 'checked': False, 'occupied': True}, {'valid': True, 'owner': 0, 'checked': True, 'occupied': True}, {'valid': True, 'owner': -1, 'checked': False, 'occupied': False}, {'valid': True, 'owner': 1, 'checked': False, 'occupied': True}, {'valid': True, 'owner': 1, 'checked': True, 'occupied': True}, {'valid': True, 'owner': -1, 'checked': False, 'occupied': False}, {'valid': True, 'owner': -1, 'checked': False, 'occupied': False}, {'valid': True, 'owner': -1, 'checked': False, 'occupied': False}]
+
+    def test_values(self):
+        self.assertListEqual(fen.deserialize_row(self.input), self.expected)
+
 if __name__ == '__main__':
     unittest.main()
