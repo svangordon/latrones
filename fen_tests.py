@@ -96,5 +96,9 @@ class TestSerializeBoardString(unittest.TestCase):
     def test_empty_board(self):
         self.assertEqual(self.expected_empty_board, fen.serialize_board_string(self.empty_board_input))
 
+class TestSerializeFenString(unittest.TestCase):
+    def test_empty_board(self):
+        self.assertEqual(fen.create_fen(8, 12), fen.serialize_fen_string(fen.deserialize_fen_string(fen.create_fen(8,12))))
+
 if __name__ == '__main__':
     unittest.main()
