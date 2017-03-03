@@ -151,6 +151,7 @@ class TestDeleteGame(unittest.TestCase):
         self.assertIsNone(getResp)
 
 class TestGetParticipantByUser(unittest.TestCase):
+    """ This is probably going to wind up abandonded. """
     def setUp(self):
         self.user_id = 22
         self.expected = ((10, 22, 1), (11, 22, 8))
@@ -158,6 +159,13 @@ class TestGetParticipantByUser(unittest.TestCase):
     def test_values(self):
         self.assertEqual(latr.get_participant_by_user(self.user_id), self.expected)
 
+class TestGetGameByUser(unittest.TestCase):
+    def setUp(self):
+        self.user_id = 22
+        self.expected = ((1, datetime.datetime(2017, 3, 1, 16, 55, 57), 8, 8), (8, datetime.datetime(2017, 3, 1, 17, 17, 2), 8, 8))
+
+    def test_values(self):
+        self.assertEqual(latr.get_games_by_user(self.user_id), self.expected)
 
 if __name__ == '__main__':
     unittest.main()

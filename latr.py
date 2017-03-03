@@ -170,16 +170,13 @@ def get_all_games_handler():
     cur.close()
     return row
 
-# @hug.local()
-# @hug.delete('/game/{game_id}')
-# def delete_game_handler():
-#     cur = cnx.cursor()
-#     try:
-#         cur.execute(sql_templates["delete_game"].format(game_id=game_id, game_table=constants.db["game"]))
-#     except MySQLdb.Error as e:
-#         return "Could not delete game. {0}".format(e[0])
-#     cur.close()
-#     return "Game deleted"
+@hug.get('/games/user/{user_id}')
+def get_games_by_user(user_id, response=None):
+    cur = cnx.cursor()
+    cur.execute(sql_templates["game"]["get_by_user"].format(user_id=user_id))
+    row = cur.fetchall()
+    cur.close()
+    return row
 
 ###
 # Util Handlers
