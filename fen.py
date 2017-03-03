@@ -18,6 +18,10 @@ def deserialize_fen_string(fen_input:str):
     fen_dict = dict(zip(columns, map(fen_map, fen_input.split(' '))))
     fen_dict['board'] = deserialize_board_string(fen_dict["board"])
     fen_dict['active_player'] = 0 if fen_dict['active_player'] == 'w' else 1
+
+    # print(len(fen_dict['board']), (fen_dict["board_width"]+2)*(fen_dict["board_height"]+2))
+    # assert len(fen_dict['board']) == (fen_dict["board_width"]+2)*(fen_dict["board_height"]+2)
+
     return fen_dict
 
 def deserialize_board_string(fen_input:str):
@@ -34,9 +38,11 @@ def deserialize_board_string(fen_input:str):
         except ValueError:
             board_width += 1
             passed_one = false
-    # print(board_width)
 
     output_board = [generate_square(-1)] * board_width
+    # for row in fen_input.split('/'):
+        # output_board.extend(list(map(deserialize_row, row)))
+    # output_board.extend(list())
     output_board.extend([item for sublist in map(deserialize_row, fen_input.split('/')) for item in sublist])
     output_board.extend([generate_square(-1)] * board_width)
 
@@ -45,7 +51,14 @@ def deserialize_board_string(fen_input:str):
 def deserialize_row(row_input):
     output_row = [generate_square(-1)]
     # print(len(row_input))
+    passed_one = False
     for char in row_input:
+        if char.isdigit() and passed_one:
+            output_row.extend(deserialize_char(9))
+        if char == '1':
+            passed_one = True
+        else:
+            passed_one = False
         output_row.extend(deserialize_char(char))
     output_row.extend([generate_square(-1)])
     return output_row
