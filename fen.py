@@ -100,3 +100,39 @@ def generate_char(square):
     if square["checked"]:
         output = output.upper()
     return output
+
+# def serialize_fen_string(fen_object):
+
+
+def serialize_board_string(board_list):
+    output = []
+    passed_invalid = False
+    entered_board = False
+    empty_count = 0
+    for square in board_list:
+        if not square['valid']:
+            passed_invalid = True
+            if empty_count != 0:
+                output.extend(str(empty_count))
+            empty_count = 0
+            # continue
+        elif square["valid"]:
+            if passed_invalid:
+                passed_invalid = False
+                if not entered_board:
+                    entered_board = True
+                else:
+                    output.extend('/') # probably need to move delimiters to constants
+            if not square["occupied"]:
+                empty_count += 1
+            elif square["occupied"]:
+                if empty_count != 0:
+                    output.extend(str(empty_count))
+                    empty_count = 0
+                output.extend(generate_char(square))
+            else:
+                raise ValueError("fell through unexpectedly")
+            # output.extend(generate_char(square))
+        else:
+            raise ValueError('fell through unexpectedly')
+    return ''.join(output)
