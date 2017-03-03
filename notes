@@ -114,3 +114,13 @@ Tests:
     -- DELETE /user/user_id -- check that it doesn't exist
   - /participant
     -- POST /
+
+squares look like:
+  {
+    occupied: Bool,
+    checked: False | (checking_sq_1, checking_sq_2) : (int)
+    owner: 0|1,
+    valid: Bool
+  }
+
+  One can get around storing which pieces are capturing a piece.
