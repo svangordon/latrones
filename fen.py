@@ -27,11 +27,16 @@ def deserialize_board_string(fen_input:str):
     """ Return a list of dicts representing the game board"""
     # fen_dict = dict(zip(('boardString', 'boardWidth', 'boardHeight', 'activePlayer', 'stoneCount', 'gamePhase', 'halfmoveClock', 'fullMoveClock') ,fen_input.split(' ')))
     board_width = 2 # add one on each side
+    passed_one = False
     for char in fen_input.split('/')[0]:
         try:
             board_width += int(char)
+            if passed_one:
+                board_width += 9
+            passed_one = int(char) == 1
         except ValueError:
             board_width += 1
+            passed_one = false
     # print(board_width)
 
     output_board = [generate_square(-1)] * board_width
