@@ -124,3 +124,12 @@ squares look like:
   }
 
   One can get around storing which pieces are capturing a piece.
+
+  Possible rule changes:
+  -- Custodial check, then displacement capture (by either piece or a third piece)
+  -- No placing phase
+  -- Pieces can only move backwards by jumping (might remove need for checking at all)
+  -- side of the board (possibly player's edges?) counts as a piece for checking
+  -- Possibly, no jumping backwards over enemy pieces
+  -- maybe boardwidth-2 pieces?
+  -- Major change w/o historical basis: any piece can be captured by displacement if it borders 2 enemy stones

@@ -7,15 +7,18 @@ def create_fen(board_width, board_height):
     position_string = '/'.join([str(board_width)] * board_height)
     return Template("$position_string $board_width $board_height w 0 d 0 1").substitute(locals())
 
-# def deserialize_fen(fen_input:str):
-#     """ Put the game in a python-parsable state"""
-#     fen_dict = dict(zip(('boardString', 'boardWidth', 'boardHeight', 'activePlayer', 'stoneCount', 'gamePhase', 'halfmoveClock', 'fullMoveClock') ,fen_input.split(' ')))
-#     # input_board = fen.split(' ')[0].split('/')
-#     output_board = [[]]
-#     for row in fen_dict["boardString"].split('/'):
-#         for char in row:
-#             if
-#
+def deserialize_fen_string(fen_input:str):
+    """ Return a list of dicts representing the game board"""
+    fen_dict = dict(zip(('boardString', 'boardWidth', 'boardHeight', 'activePlayer', 'stoneCount', 'gamePhase', 'halfmoveClock', 'fullMoveClock') ,fen_input.split(' ')))
+    # input_board = fen.split(' ')[0].split('/')
+    output_board = [char_generator(-1)] * int(fen_dict["boardWidth"])
+
+    output_board.extend(map(deserialize_row, fen_dict["boardString"].split('/')))
+
+    output_board.extend([char_generator(-1)] * int(fen_dict["boardWidth"]))
+
+    return output_board
+
 def deserialize_row(row_input):
     output_row = [char_generator(-1)]
     for char in list(row_input):
