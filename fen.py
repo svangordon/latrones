@@ -34,18 +34,18 @@ def deserialize_board_string(fen_input:str):
             board_width += 1
     # print(board_width)
 
-    output_board = [char_generator(-1)] * board_width
+    output_board = [generate_square(-1)] * board_width
     output_board.extend([item for sublist in map(deserialize_row, fen_input.split('/')) for item in sublist])
-    output_board.extend([char_generator(-1)] * board_width)
+    output_board.extend([generate_square(-1)] * board_width)
 
     return output_board
 
 def deserialize_row(row_input):
-    output_row = [char_generator(-1)]
+    output_row = [generate_square(-1)]
     # print(len(row_input))
     for char in row_input:
         output_row.extend(deserialize_char(char))
-    output_row.extend([char_generator(-1)])
+    output_row.extend([generate_square(-1)])
     return output_row
 
 def deserialize_char(char_input):
@@ -53,15 +53,15 @@ def deserialize_char(char_input):
     if char_input == str(-1):
         raise TypeError("deserialize_char passed -1")
     try:
-        return int(char_input) * [char_generator(None)]
+        return int(char_input) * [generate_square(None)]
     except ValueError as e:
         # print('received {0}'.format(char_input))
-        return [char_generator(char_input)]
+        return [generate_square(char_input)]
 
 
-def char_generator(char=None):
+def generate_square(char=None):
     """ Pass -1 for non-valid squares """
-    # print('char_generator received', char)
+    # print('generate_square received', char)
     output = {
         "occupied": False,
         "checked": False,
