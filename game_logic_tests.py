@@ -46,9 +46,21 @@ class TestSquareConversion(unittest.TestCase):
         board_height = 8
         with self.assertRaises(ValueError):
             game_logic.convert_alg_to_point(square, board_width, board_height)
-        # resp = game_logic.convert_alg_to_point(square, board_width, board_height)
-        # expected_resp = None # maybe should raise?
-        # self.assertEqual(expected_resp, resp)
+
+    def test_point_to_alg(self):
+        board_width = 12
+        board_height = 8
+        test_tuples = [(43, 'a3'), (124, 'l8'), (62, 'f4'), (100, 'b7')]
+        for test in test_tuples:
+            self.assertEqual(game_logic.convert_point_to_alg(test[0], board_width, board_height), test[1])
+
+    def test_invalid_point_to_alg(self):
+        board_width = 12
+        board_height = 8
+        test_squares = [0, 4, 13, 56, 126, 133, 139]
+        for test in test_squares:
+            with self.assertRaises(ValueError):
+                game_logic.convert_point_to_alg(test, board_width, board_height)
 
 # class TestMoveValidation(unittest.TestClass):
 #     def setUp(self):
