@@ -18,6 +18,7 @@ def deserialize_fen_string(fen_input:str):
     fen_dict = dict(zip(columns, map(fen_map, fen_input.split(' '))))
     fen_dict['board'] = deserialize_board_string(fen_dict["board"])
     fen_dict['active_player'] = 0 if fen_dict['active_player'] == 'w' else 1
+    fen_dict["row_width"] = fen_dict["board_width"] + 2
 
     assert len(fen_dict['board']) == (fen_dict["board_width"]+2)*(fen_dict["board_height"]+2)
 
