@@ -74,11 +74,34 @@ def check_adjacent(game, central_square, *squares):
             return False
     return True
 
-def check_occupied(game, *squares):
-    """ Check whether passed squares are occupied """
+# def check_occupied(game, *squares):
+#     """ Check whether passed squares are occupied """
+#     row_width = game["board_width"] + 2
+#     for square in squares:
+#         int(square)
+#         if not game["board"][square]["occupied"]:
+#             return False
+#     return True
+#
+# def check_valid(game, *squares):
+#     row_width = game["board_width"] + 2
+#     for square in squares:
+#         if not game["board"][square]["valid"]:
+#             return False
+#     return True
+
+def check_attr(game, attr, expected, *squares):
+    """ Check whether attr of squares == expected """
+    valid_attr = ["occupied", "checked", "owner", "valid"]
+    # handle a list, if passed
+    try:
+        squares = list(squares[0])
+    except TypeError:
+        pass
+    if not attr in valid_attr:
+        raise ValueError("bad attr {0}".format(attr))
     row_width = game["board_width"] + 2
     for square in squares:
-        int(square)
-        if not game["board"][square]["occupied"]:
+        if not game["board"][square][attr] == expected:
             return False
     return True

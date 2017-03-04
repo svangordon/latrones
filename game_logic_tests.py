@@ -163,29 +163,76 @@ class TestCheckAdjacent(unittest.TestCase):
         with self.assertRaises(TypeError):
             self.fn(self.game, 69, [1, 2, 3])
 
-class TestCheckOccupied(unittest.TestCase):
+# class TestCheckOccupied(unittest.TestCase):
+#     def setUp(self):
+#         self.fen_string = "wWbB8/12/3w8/3wb7/3w8/3B8/12/12 12 8 b 0 0 1"
+#         self.game = fen.deserialize_fen_string(self.fen_string)
+#         self.occupied_squares = [15, 16, 17, 18]
+#         self.unoccupied_squares = [28, 29, 30, 31]
+#         self.fn = game_logic.check_occupied
+#
+#     def test_occupied(self):
+#         for square in self.occupied_squares:
+#             self.assertTrue(self.fn(self.game, square))
+#         self.assertTrue(self.fn(self.game, *self.occupied_squares))
+#
+#     def test_unoccupied(self):
+#         for square in self.unoccupied_squares:
+#             self.assertFalse(self.fn(self.game, square))
+#         self.assertFalse(self.fn(self.game, *self.unoccupied_squares))
+#
+#     def test_raises(self):
+#         with self.assertRaises(TypeError):
+#             self.fn(self.game, self.occupied_squares)
+#         with self.assertRaises(IndexError):
+#             self.fn(self.game, (self.game["board_width"] + 2)*(self.game["board_height"] + 2) + 1)
+
+class TestCheckAttr(unittest.TestCase):
     def setUp(self):
         self.fen_string = "wWbB8/12/3w8/3wb7/3w8/3B8/12/12 12 8 b 0 0 1"
         self.game = fen.deserialize_fen_string(self.fen_string)
-        self.occupied_squares = [15, 16, 17, 18]
-        self.unoccupied_squares = [28, 29, 30, 31]
-        self.fn = game_logic.check_occupied
+        self.fn = game_logic.check_attr
 
-    def test_occupied(self):
-        for square in self.occupied_squares:
-            self.assertTrue(self.fn(self.game, square))
-        self.assertTrue(self.fn(self.game, *self.occupied_squares))
+    def test_check_check(self):
+        checked = [16, 18]
+        not_checked = [14, 15, 19]
+        self.assertTrue(self.fn(self.game, 'checked', True, *checked))
+        self.assertFalse(self.fn(self.game, 'checked', False, checked))
+        self.assertFalse(self.fn(self.game, 'checked', True, *not_checked))
+        self.assertTrue(self.fn(self.game, 'checked', False, not_checked))
+        self.assertFalse(self.fn(self.game, 'checked', False, *checked, *not_checked))
+        self.assertFalse(self.fn(self.game, 'checked', True, *checked, *not_checked))
 
-    def test_unoccupied(self):
-        for square in self.unoccupied_squares:
-            self.assertFalse(self.fn(self.game, square))
-        self.assertFalse(self.fn(self.game, *self.unoccupied_squares))
+    def test_check_occupied(self):
+        occupied = [15, 16, 17, 18]
+        not_occupied = [14, 19]
+        self.assertTrue(self.fn(self.game, "occupied", True, occupied))
+        self.assertFalse(self.fn(self.game, "occupied", False, *occupied))
+        self.assertFalse(self.fn(self.game, "occupied", True, not_occupied))
+        self.assertTrue(self.fn(self.game, "occupied", False, *not_occupied))
+        self.assertFalse(self.fn(self.game, "occupied", True, *occupied, *not_occupied))
+        self.assertFalse(self.fn(self.game, "occupied", False, *occupied, *not_occupied))
 
-    def test_raises(self):
-        with self.assertRaises(TypeError):
-            self.fn(self.game, self.occupied_squares)
-        with self.assertRaises(IndexError):
-            self.fn(self.game, (self.game["board_width"] + 2)*(self.game["board_height"] + 2) + 1)
+    def test_check_valid(self):
+        valid = [15, 16, 17, 18, 19, 33, 47, 48]
+        not_valid = [0, 13, 126, 139, 6, 56, 55]
+        self.assertTrue(self.fn(self.game, "valid", True, valid))
+        self.assertFalse(self.fn(self.game, "valid", False, *valid))
+        self.assertTrue(self.fn(self.game, "valid", False, not_valid))
+        self.assertFalse(self.fn(self.game, "valid", True, *not_valid))
+        self.assertFalse(self.fn(self.game, "valid", True, *valid, *not_valid))
+        self.assertFalse(self.fn(self.game, "valid", False, *valid, *not_valid))
+
+    def test_check_owner(self):
+        owner_white = [15, 16]
+        owner_black = [17, 18]
+        owner_none = [14, 19]
+        self.assertTrue(self.fn(self.game, "owner", 0, owner_white))
+        self.assertTrue(self.fn(self.game, "owner", 1, owner_black))
+        self.assertTrue(self.fn(self.game, "owner", -1, owner_none))
+        self.assertFalse(self.fn(self.game, "owner", 0, *owner_white, *owner_black))
+        self.assertFalse(self.fn(self.game, "owner", 1, *owner_white, *owner_black))
+        self.assertFalse(self.fn(self.game, "owner", -1, *owner_none, *owner_black))
 
 if __name__ == '__main__':
     unittest.main()
