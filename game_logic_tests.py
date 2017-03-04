@@ -163,5 +163,29 @@ class TestCheckAdjacent(unittest.TestCase):
         with self.assertRaises(TypeError):
             self.fn(self.game, 69, [1, 2, 3])
 
+class TestCheckOccupied(unittest.TestCase):
+    def setUp(self):
+        self.fen_string = "wWbB8/12/3w8/3wb7/3w8/3B8/12/12 12 8 b 0 0 1"
+        self.game = fen.deserialize_fen_string(self.fen_string)
+        self.occupied_squares = [15, 16, 17, 18]
+        self.unoccupied_squares = [28, 29, 30, 31]
+        self.fn = game_logic.check_occupied
+
+    def test_occupied(self):
+        for square in self.occupied_squares:
+            self.assertTrue(self.fn(self.game, square))
+        self.assertTrue(self.fn(self.game, *self.occupied_squares))
+
+    def test_unoccupied(self):
+        for square in self.unoccupied_squares:
+            self.assertFalse(self.fn(self.game, square))
+        self.assertFalse(self.fn(self.game, *self.unoccupied_squares))
+
+    def test_raises(self):
+        with self.assertRaises(TypeError):
+            self.fn(self.game, self.occupied_squares)
+        with self.assertRaises(IndexError):
+            self.fn(self.game, (self.game["board_width"] + 2)*(self.game["board_height"] + 2) + 1)
+
 if __name__ == '__main__':
     unittest.main()

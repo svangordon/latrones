@@ -36,7 +36,7 @@ def deserialize_board_string(fen_input:str):
             passed_one = int(char) == 1
         except ValueError:
             board_width += 1
-            passed_one = false
+            passed_one = False
 
     output_board = [generate_square(-1)] * board_width
     # for row in fen_input.split('/'):

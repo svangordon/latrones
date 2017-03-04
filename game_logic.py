@@ -73,3 +73,12 @@ def check_adjacent(game, central_square, *squares):
         central_square + row_width, central_square - row_width]:
             return False
     return True
+
+def check_occupied(game, *squares):
+    """ Check whether passed squares are occupied """
+    row_width = game["board_width"] + 2
+    for square in squares:
+        int(square)
+        if not game["board"][square]["occupied"]:
+            return False
+    return True
