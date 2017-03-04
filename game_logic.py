@@ -89,3 +89,22 @@ def check_attr(game, attr, expected, *squares):
         if not game["board"][square][attr] == expected:
             return False
     return True
+
+def check_piece_arrival(game, move_start, move_end):
+    """ checks whether a piece can legally arrive at its destination square,
+        based solely on the contents of the origin and dest squares. Returns Bool.
+    """
+    start_square = game["board"][move_start]
+    end_square = game["board"][move_end]
+    # probably kill this
+    if not check_attr(game, "valid", True, move_start, move_end):
+        raise ValueError("checking arrival for invalid squares")
+    if not check_attr(game, "occupied", True, move_start):
+        raise ValueError("attempting to move from invalid square")
+    if check_attr(game, "occupied", True, move_end):
+        if check_attr(game, "owner", start_square["owner"], move_start, move_end):
+            return False
+        if game["rules"]["displacement_capture"]: #NB: as of writing, the rules dict hasn't actually been added
+            return check_attr(game, "checked", True, move_end)
+        return False
+    return True

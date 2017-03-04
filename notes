@@ -135,3 +135,17 @@ squares look like:
   -- Major change w/o historical basis: any piece can be captured by displacement if it borders 2 enemy stones
 
   Decision: No deployment phase.
+
+  -- Note: Maybe allow multiple captures, as in hasami shogi
+  -- talk of "city" in laius pisonis might refer to the creation / attack of drawing fortresses
+  -- In at least one variant of hasami shogi, the opponent's board edge can aid in capturing your stones
+    (ie, your board edge acts as if it were occupied entirely by your stones) (though i think this might be a bug? maybe it's some kind of 'if you have no liberties' thing)
+  -- Consider alternate #s of pieces to capture for win (ie, you win when you cap 4) in the vein of hasami shogi
+
+  -- I'm not the only one to consider the possibility that the one places a 'camp' marker that one must then defend.
+  A model with three types of pieces. This actually works. If the pieces are hemispherical, players'
+  pieces can be distinguished by flipping them. One possibility is that there are 'officers'
+  who move like rooks, 'soldiers' who move either like pawns or one space orthogonally,
+  and some kind of either "camp" token that must be defended or "dux" token that's like a king.
+  This isn't supported by that one board that they found, but I don't know if it's
+  reasonable to assume that board was set up correctly anyway

@@ -234,5 +234,24 @@ class TestCheckAttr(unittest.TestCase):
         self.assertFalse(self.fn(self.game, "owner", 1, *owner_white, *owner_black))
         self.assertFalse(self.fn(self.game, "owner", -1, *owner_none, *owner_black))
 
+class TestCheckPieceArrival(unittest.TestCase):
+    def setUp(self):
+        self.fen_string = "wWbB8/12/3w8/3wb7/3w8/3B8/12/12 12 8 b 0 0 1"
+        self.game = fen.deserialize_fen_string(self.fen_string)
+        self.game["rules"] = {}
+        self.fn = game_logic.check_piece_arrival
+
+    def test_with_custod(self):
+        self.game["rules"]["displacement_capture"] = True
+        valid_move_pairs = [(15, 18), (15, 29), (17, 16), (17, 31)]
+        for move in valid_move_pairs:
+            self.assertTrue(self.fn(self.game, *move))
+
+    def test_invalid_move_pairs(self):
+        self.game["rules"]["displacement_capture"] = False
+        invalid_move_pairs = [(15, 18), (15, 16), (17, 16), (17, 18)]
+        for move in invalid_move_pairs:
+            self.assertFalse(self.fn(self.game, *move))
+
 if __name__ == '__main__':
     unittest.main()
