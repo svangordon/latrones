@@ -116,6 +116,8 @@ class TestValidateJump(unittest.TestCase):
         self.fn = game_logic.validate_jump
         self.valid_fen = "12/12/3w8/3wb7/3w8/3B8/12/12 12 8 b 0 0 1"
         self.valid_dict = fen.deserialize_fen_string(self.valid_fen)
+        self.invalid_fen = "12/12/3b8/3w8/3w8/3b8/12/12 12 8 b 0 0 1"
+        self.invalid_dict = fen.deserialize_fen_string(self.invalid_fen)
 
     def test_valid_jumps(self):
         start = 60
@@ -127,7 +129,11 @@ class TestValidateJump(unittest.TestCase):
     def test_valid_setup(self):
         self.assertEqual(self.valid_dict["board"][60]["owner"], 0)
 
-
+    def test_invalid_jumps(self):
+        # jump_coords = [(60, 61, 62), (60, 46, 32), (60, 74, 88)]
+        jump_coords = [(60, 61, 62)]
+        for coord in jump_coords:
+            self.assertFalse(self.fn(*coord, self.invalid_dict))
 
 if __name__ == '__main__':
     unittest.main()
