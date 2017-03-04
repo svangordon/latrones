@@ -36,7 +36,8 @@ def validate_move(game_object, move_from, move_to, jumps=None):
         return False
 
 def is_backwards(move_start, move_end, active_player, board_width):
-    """ Return whether a given move is backwards. Only interested in whether it is a single step backwards """
+    """ Return whether a given move is backwards. Only interested in whether
+    it is a single step backwards (as opposed to a jump)"""
     step = -(board_width+2) if active_player == 0 else board_width+2
     return move_start + step == move_end
 
@@ -59,3 +60,16 @@ def validate_jump(start_coord, jumped_coord, end_coord, game_object):
         (start_coord == jumped_coord - row_len and start_coord == end_coord - row_len*2) or \
         (start_coord == jumped_coord + row_len and start_coord == end_coord + row_len*2)
     return coord_valid and jumped_square["owner"] != -1 and (end_square["checked"] or end_square["owner"] == -1) and end_square["valid"] == True
+
+def check_adjacent(game, central_square, *squares):
+    """ Returns if all args are adjacent to central_square.
+    come to think of it, why would this need to accept multiple squares? """
+    row_width = game["board_width"] + 2
+    if len(squares) > 4:
+        raise ValueError("too many squares passed to check_adjacent")
+    for square in squares:
+        int(square)
+        if square not in [central_square + 1, central_square - 1,
+        central_square + row_width, central_square - row_width]:
+            return False
+    return True
