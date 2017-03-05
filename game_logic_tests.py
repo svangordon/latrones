@@ -100,17 +100,18 @@ class TestSquareConversion(unittest.TestCase):
 #         end_move = 'c7'
 #         self.assertFalse(game_logic.validate_move(white_dict, start_move, end_move))
 #         self.assertFalse(game_logic.validate_move(black_dict, start_move, end_move))
-#
-# class TestIsMoveBackwards(unittest.TestCase):
-#     def setUp(self):
-#         self.fn = game_logic.is_backwards
-# # (move_start, move_end, active_player, board_width)
-#     def test_values(self):
-#         tests = [(False, (61, 75, 0, 12)), (False, (61, 62, 0, 12)), (False, (61, 60, 0, 12)), (True, (61, 47, 0, 12)),
-#         (True, (61, 75, 1, 12)), (False, (61, 62, 1, 12)), (False, (61, 60, 1, 12)), (False, (61, 47, 1, 12))]
-#         for test in tests:
-#             self.assertEqual(test[0], self.fn(*test[1]))
-#
+
+class TestIsMoveBackwards(unittest.TestCase):
+    def setUp(self):
+        self.fn = game_logic.is_backwards
+        # self.game = fen.deserialize_fen_string(fen.create_fen(8,12))
+# (move_start, move_end, active_player, board_width)
+    def test_values(self):
+        game = fen.deserialize_fen_string(fen.create_fen(12, 8))
+        tests = [(False, (61, 75)), (False, (61, 62)), (False, (61, 60)), (True, (61, 47))]
+        for test in tests:
+            self.assertEqual(test[0], self.fn(game, *test[1]))
+
 # class TestValidateJump(unittest.TestCase):
 #     def setUp(self):
 #         self.fn = game_logic.validate_jump
@@ -162,30 +163,6 @@ class TestCheckAdjacent(unittest.TestCase):
     def test_type_validation(self):
         with self.assertRaises(TypeError):
             self.fn(self.game, 69, [1, 2, 3])
-
-# class TestCheckOccupied(unittest.TestCase):
-#     def setUp(self):
-#         self.fen_string = "wWbB8/12/3w8/3wb7/3w8/3B8/12/12 12 8 b 0 0 1"
-#         self.game = fen.deserialize_fen_string(self.fen_string)
-#         self.occupied_squares = [15, 16, 17, 18]
-#         self.unoccupied_squares = [28, 29, 30, 31]
-#         self.fn = game_logic.check_occupied
-#
-#     def test_occupied(self):
-#         for square in self.occupied_squares:
-#             self.assertTrue(self.fn(self.game, square))
-#         self.assertTrue(self.fn(self.game, *self.occupied_squares))
-#
-#     def test_unoccupied(self):
-#         for square in self.unoccupied_squares:
-#             self.assertFalse(self.fn(self.game, square))
-#         self.assertFalse(self.fn(self.game, *self.unoccupied_squares))
-#
-#     def test_raises(self):
-#         with self.assertRaises(TypeError):
-#             self.fn(self.game, self.occupied_squares)
-#         with self.assertRaises(IndexError):
-#             self.fn(self.game, (self.game["board_width"] + 2)*(self.game["board_height"] + 2) + 1)
 
 class TestCheckAttr(unittest.TestCase):
     def setUp(self):
