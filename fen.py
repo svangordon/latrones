@@ -19,6 +19,12 @@ def deserialize_fen_string(fen_input:str):
     fen_dict['board'] = deserialize_board_string(fen_dict["board"])
     fen_dict['active_player'] = 0 if fen_dict['active_player'] == 'w' else 1
     fen_dict["row_width"] = fen_dict["board_width"] + 2
+    fen_dict["rules"] = {
+        "displacement_capture": True,
+        "allow_jump_enemy_backwards": True,
+        "allow_backwards": True,
+        "check": True
+    }
 
     assert len(fen_dict['board']) == (fen_dict["board_width"]+2)*(fen_dict["board_height"]+2)
 
