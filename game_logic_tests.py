@@ -230,5 +230,27 @@ class TestCheckPieceArrival(unittest.TestCase):
         for move in invalid_move_pairs:
             self.assertFalse(self.fn(self.game, *move))
 
+class TestValidateMove(unittest.TestCase):
+    def setUp(self):
+        self.fn = game_logic.validate_move
+
+    def test_simple_moves(self):
+        game = fen.deserialize_fen_string("wWbB8/12/3w8/4b7/3w8/3B8/12/12 12 8 b 0 0 1")
+        game["rules"] = {"allow_backwards": True}
+        start = 46
+        valid = [32, 60, 45, 47]
+        for move in valid:
+            self.assertTrue(self.fn(game, start, move))
+
+class TestValidateJump(unittest.TestCase):
+    def setUp(self):
+        self.fn = game_logic.validate_jump
+
+    def test_simple_jump(self):
+        game = fen.deserialize_fen_string("wWbB8/12/3w8/4b7/12/3B8/12/12 12 8 b 0 0 1")
+        game["rules"] = {"allow_backwards": True, "allow_jump_enemy_backwards": True}
+        start = 46
+        self.assertTrue(self.fn(game, 46, 74))
+
 if __name__ == '__main__':
     unittest.main()

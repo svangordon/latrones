@@ -4,8 +4,6 @@ import hug
 
 import constants
 from constants import sql_templates
-from Users import create_user
-from Users import get_user
 import falcon
 
 cnx = MySQLdb.connect(host="localhost", user="igoinu", passwd="password", db="latr")

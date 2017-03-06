@@ -20,21 +20,6 @@ def convert_point_to_alg(coord, board_width, board_height):
     row = int(coord / (board_width + 2))
     return ascii_lowercase[col] + str(row)
 
-# def validate_move(game_object, move_from, move_to, jumps=None):
-#     """ Return Bool for whether a given move is legal """
-#     board_dim = (game_object["board_width"], game_object["board_height"])
-#     origin_point = convert_alg_to_point(move_from, *board_dim)
-#     origin_square = game_object["board"][origin_point]
-#     dest_point = convert_alg_to_point(move_to, *board_dim)
-#     dest_square = game_object["board"][dest_point]
-#     # origin square should be owned by active player
-#     if origin_square["owner"] != game_object["active_player"]:
-#         return False
-#
-#     # dest square should be valid
-#     if not dest_square["valid"]:
-#         return False
-
 def is_backwards(game, move_start, move_end):
     """ Return whether a given move is backwards. Only interested in whether
     it is a single step backwards (as opposed to a jump)"""
@@ -42,25 +27,38 @@ def is_backwards(game, move_start, move_end):
     step = -(row_width) if game["active_player"] == 0 else row_width
     return move_start + step == move_end
 
-def validate_jump(game, start_coord, jumped_coord, end_coord):
+def validate_jump(game, move_start, move_end):
     """ Return whether a given jump is valid; only looks at the direction. If it is
     a backwards move or jumping piece is checked, checks that jumped piece is friendly.
-    Only checks one jump, use multiple calls to check multiple jumps in a turn"""
-    start_square = game_object["board"][start_coord]
-    jumped_square = game_object["board"][jumped_coord]
-    end_square = game_object["board"][end_coord]
-    row_len = game_object["board_width"] + 2
+    Only checks one jump, use multiple calls to check multiple jumps in a turn.
+    Checks that end is a valid step from start. Then checks piece arrival (which
+    it has to)
+    """
+    if move_end == move_start + 2:
+        jumped_coord = move_start + 1
+    elif move_end == move_start - 2:
+        jumped_coord = move_start - 1
+    elif move_end == move_start - game["row_width"]*2:
+        jumped_coord = move_start - game["row_width"]
+    elif move_end == move_start + game["row_width"]*2:
+        jumped_coord = move_start + game["row_width"]
+    else:
+        raise ValueError("Bad jump coord")
+    start_square = game["board"][move_start]
+    jumped_square = game["board"][jumped_coord]
 
-    # if jump is backwards or jumping piece is checked, jumped piece must be friendly
-    if (is_backwards(start_coord, jumped_coord, game_object["active_player"], game_object["board_width"]) \
-        or start_square["checked"]) and \
-        not start_square["owner"] == jumped_square["owner"]:
-            return False
-    coord_valid = (start_coord == jumped_coord + 1 and start_coord == end_coord + 2) or \
-        (start_coord == jumped_coord -1 and start_coord == end_coord -2) or \
-        (start_coord == jumped_coord - row_len and start_coord == end_coord - row_len*2) or \
-        (start_coord == jumped_coord + row_len and start_coord == end_coord + row_len*2)
-    return coord_valid and jumped_square["owner"] != -1 and (end_square["checked"] or end_square["owner"] == -1) and end_square["valid"] == True
+    if not check_piece_arrival(game, move_start, move_end):
+        raise ValueError("Bad piece arrival")
+        return False
+    if not game["rules"]["allow_jump_enemy_backwards"] \
+    and not start_square["owner"] == jumped_square["owner"] \
+    and is_backwards(game, move_start, jumped_coord):
+        raise ValueError("jumping backwards over enemey")
+        # return False
+    if start_square["checked"] and not start_square["owner"] == jumped_square["owner"]:
+        raise ValueError("Checked piece jumping non-friendly piece")
+        # return False
+    return True
 
 def check_adjacent(game, central_square, *squares):
     """ Returns if all args are adjacent to central_square.
@@ -94,6 +92,9 @@ def check_attr(game, attr, expected, *squares):
 def check_piece_arrival(game, move_start, move_end):
     """ checks whether a piece can legally arrive at its destination square,
         based solely on the contents of the origin and dest squares. Returns Bool.
+        Checks that start and end are valid, check that start is occupied.
+        If end is occupied, checks that end piece is different from moving player,
+        and that it's checked, and that displacement capture is allowed.
     """
     start_square = game["board"][move_start]
     end_square = game["board"][move_end]
@@ -111,16 +112,23 @@ def check_piece_arrival(game, move_start, move_end):
     return True
 
 def validate_move(game, move_start, move_end, jumps=None):
-    if not check_piece_arrival(game, move_start, move_end) and \
+    """
+    Validates move. Checks that check_piece_arrival returns true,
+    that move start and end are valid, and that start is occupied.
+    Then, if jumps, validates all jumps. If no jumps, checks is_backwards if not
+    allow_backwards and then checks check_adjacent.
+    """
+    if not (check_piece_arrival(game, move_start, move_end) and \
     check_attr(game, "valid", True, move_start, move_end) and \
-    check_attr(game, "occupied", True, move_start):
+    check_attr(game, "occupied", True, move_start)):
         return False
     if jumps:
         for jump in jumps:
-            if not validate_jump(game, start_coord, jumped_coord, end_coord):
+            if not validate_jump(game, *jump):
                 return False
     else:
         if not game["rules"]["allow_backwards"] and \
         is_backwards(game, move_start, move_end) or \
         not check_adjacent(game, move_start, move_end):
             return False
+    return True
