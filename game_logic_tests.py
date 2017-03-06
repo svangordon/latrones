@@ -254,12 +254,12 @@ class TestValidateJump(unittest.TestCase):
 
 class TestIsChecking(unittest.TestCase):
     def setUp(self):
-        self.fn = game_logic.is_checking
+        self.is_checking = game_logic.is_checking
 
     def test_simple(self):
         game = fen.deserialize_fen_string("12/12/3wbw6/12/12/12/12/12 12 8 b 0 0 1")
         expected = [47]
-        result = self.fn(game, 46)
+        result = self.is_checking(game, 46, True)
         self.assertEqual(expected, result)
 
 class TestIsSandwiched(unittest.TestCase):
@@ -267,7 +267,7 @@ class TestIsSandwiched(unittest.TestCase):
         self.fn = game_logic.is_sandwiched
 
     def test_is_sandwiched(self):
-        game = fen.deserialize_fen_string("12/12/3wbw6/12/12/4w7/3wbw6/4w7 12 8 b 0 0 1")
+        game = fen.deserialize_fen_string("12/12/3wBw6/12/12/4w7/3wbw6/4w7 12 8 b 0 0 1")
         expected = [[(46, 48)], [(102, 104), (89, 117)]]
         cnt = 0
         for i in range(len(game["board"])):
@@ -275,5 +275,23 @@ class TestIsSandwiched(unittest.TestCase):
                 self.assertEqual(self.fn(game, i), expected[cnt])
                 cnt += 1
 
+class TestMakeMove(unittest.TestCase):
+    def setUp(self):
+        self.make_move = game_logic.make_move
+
+    def execute_test(self, move_start, move_end, fen_start, fen_end):
+        game = fen.deserialize_fen_string("12/12/3wBw6/12/12/4w7/3wbw6/4w7 12 8 b 0 0 1")
+        self.make_move(game, move_start, move_end)
+        return (fen_end, fen.serialize_fen_string(game))
+
+    def test_simple_move(self):
+        game = fen.deserialize_fen_string("12/12/3wBw6/12/12/4w7/3wbw6/4w7 12 8 b 0 0 1")
+        expected = "12/3w8/4bw6/12/12/4w7/3wbw6/4w7 12 8 b 0 0 1"
+        self.make_move(game, 46, 32)
+        self.assertEqual(expected, fen.serialize_fen_string(game))
+
+    def test_execute_test(self):
+        var = (46, 32, "12/12/3wBw6/12/12/4w7/3wbw6/4w7 12 8 b 0 0 1", "12/3w8/4bw6/12/12/4w7/3wbw6/4w7 12 8 b 0 0 1")
+        self.assertEqual(*self.execute_test(*var))
 if __name__ == '__main__':
     unittest.main()

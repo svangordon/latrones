@@ -158,8 +158,9 @@ def validate_move(game, move_start, move_end, jumps=None):
 #
 #     if game["rules"]["check"]:
 
-def is_checking(game, piece):
-    """ Return coords for which a piece is part of the only pair checking """
+def is_checking(game, piece, only_checker=False):
+    """ Return coords for which a piece is checking, with flag for if we want
+    stones for which it is part of the only pair checking """
     # square to check if occupied, square to check if friendly & not checked, two squares to check not friendly & not checked
     to_check = [
     (piece + 1, piece + 2, piece+1 - game["row_width"], piece+1 + game["row_width"]),
@@ -173,7 +174,7 @@ def is_checking(game, piece):
         and not check_attr(game, "owner", game["board"][piece]["owner"], squares[0]) \
         and check_attr(game, "owner", game["board"][piece]["owner"], squares[1]) \
         and check_attr(game, "checked", False, squares[1]) \
-        and not (check_attr(game, "owner", game["board"][piece]["owner"], squares[2], squares[3]) and check_attr(game, "checked", False, squares[2], squares[3])):
+        and not (only_checker and check_attr(game, "owner", game["board"][piece]["owner"], squares[2], squares[3]) and check_attr(game, "checked", False, squares[2], squares[3])):
             results.append(squares[0])
     return results
 
@@ -198,3 +199,27 @@ def is_sandwiched(game, square):
         and (not game["rules"]["check"] or check_attr(game, "checked", False, *pair)):
             results.append(pair)
     return results
+
+def clear_square(game, square):
+    game["board"][square] = {
+        "occupied": False,
+        "checked": False,
+        "owner": -1,
+        "valid": True
+    }
+
+def make_move(game, move_start, move_end):
+    if game["rules"]["check"]:
+        for square in is_checking(game, move_start, True):
+            game["board"][square]["checked"] = False
+    game["board"][move_end] = dict(game["board"][move_start])
+    # empty source square
+    clear_square(game, move_start)
+    neighbors = is_checking(game, move_end)
+    for neighbor in neighbors:
+        if game["rules"]["custodial_capture"]:
+            clear_square(game, neighbor)
+        if game["rules"]["check"]:
+            game["board"][neighbor][checked] = True
+            for square in is_checking(game, neighbor, True):
+                game["board"][square]["checked"] = False
