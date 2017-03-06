@@ -162,5 +162,23 @@ class TestGetGameByUser(unittest.TestCase):
     def test_values(self):
         self.assertEqual(latr.get_games_by_user(self.user_id), self.expected)
 
+class TestMoveMethods(unittest.TestCase):
+    def setUp(self):
+        self.move_dict = {
+            "game_id": 1,
+            "half_move_clock": 1,
+            "notation": "a1 a2",
+            "position": "8/w7/8/8/8/8/8/8/8/8/8/8 8 12 w 0 0 1"
+        }
+
+    def test_add_move(self):
+        fn = latr.add_move
+        added = fn(self.move_dict)
+        expected = (added, 1, 1, 'a1 a2', '8/w7/8/8/8/8/8/8/8/8/8/8 8 12 w 0 0 1')
+        self.assertEqual(expected, latr.get_move(added))
+        latr.delete_move(added)
+        self.assertIsNone(latr.get_move(added))
+        # self.assertEqual(fn(self.move_dict), 'INSERT INTO move (game_id, half_move_clock, notation, position) VALUES (1, 1, "a1 a2", "8/w7/8/8/8/8/8/8/8/8/8/8 8 12 w 0 0 1")')
+
 if __name__ == '__main__':
     unittest.main()

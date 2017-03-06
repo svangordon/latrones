@@ -177,11 +177,45 @@ def get_games_by_user(user_id, response=None):
     return row
 
 ###
+# Move Handlers
+###
+@hug.local()
+def get_moves_by_game(game_id):
+    cur = cnx.cursor()
+    cur.execute(sql_templates["move"]["get_moves_by_game"].format(game_id=game_id))
+    row=cur.fetchall()
+    cur.close()
+    return row
+
+@hug.local()
+def add_move(move_dict):
+    cur = cnx.cursor()
+    cur.execute(sql_templates["move"]["add_move"].format(**move_dict))
+    cnx.commit()
+    row = get_last_insert(cur)
+    return row
+    # return get_last_insert(cur)
+
+@hug.local()
+def delete_move(move_id):
+    cur = cnx.cursor()
+    cur.execute(sql_templates["move"]["delete_move"].format(move_id=move_id))
+    cur.close()
+    return "move deleted"
+
+@hug.local()
+def get_move(move_id):
+    cur = cnx.cursor()
+    cur.execute(sql_templates["move"]["get_move"].format(move_id=move_id))
+    row = cur.fetchone()
+    cur.close()
+    return row
+###
 # Util Handlers
 ###
 @hug.local()
 def get_last_insert(cur):
-    """ Convenience function for getting the id of the last inserted row"""
+    """ Convenience function for getting the id of the last inserted row and closing cursor"""
     # cur = cnx.cursor()
     cur.execute(sql_templates["util"]["last_insert"])
     row = cur.fetchone()[0]

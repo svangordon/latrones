@@ -149,3 +149,6 @@ squares look like:
   and some kind of either "camp" token that must be defended or "dux" token that's like a king.
   This isn't supported by that one board that they found, but I don't know if it's
   reasonable to assume that board was set up correctly anyway
+
+  On multiple piece types: if we want "officers" and "ordinarii", represent check with a ' (or other char)
+  before the piece in the fen.

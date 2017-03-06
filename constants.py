@@ -30,6 +30,12 @@ sql_templates = {
         "get_participant": """SELECT * FROM {participant_table} WHERE participant_id = {participant_id}""",
         "get_participant_by_user": """SELECT * FROM {participant_table} WHERE user_id = {user_id}"""
     },
+    "move" : {
+        "get_moves": """SELECT * FROM move WHERE game_id={game_id} ORDER BY half_move_clock""",
+        "add_move": """INSERT INTO move (game_id, half_move_clock, notation, position) VALUES ({game_id}, {half_move_clock}, "{notation}", "{position}")""",
+        "delete_move": """DELETE FROM move WHERE move_id = {move_id}""",
+        "get_move": """SELECT * FROM move WHERE move_id={move_id}"""
+    },
     "util": {
         "last_insert": """SELECT LAST_INSERT_ID();"""
     }
