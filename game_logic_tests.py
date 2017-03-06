@@ -262,5 +262,17 @@ class TestIsChecking(unittest.TestCase):
         result = self.fn(game, 46)
         self.assertEqual(expected, result)
 
+class TestIsSandwiched(unittest.TestCase):
+    def setUp(self):
+        self.fn = game_logic.is_sandwiched
+
+    def test_is_sandwiched(self):
+        game = fen.deserialize_fen_string("12/12/3wbw6/12/12/4w7/3wbw6/4w7 12 8 b 0 0 1")
+        cnt = 1
+        for i in range(len(game["board"])):
+            if game["board"][i]["owner"] == 1:
+                self.assertEqual(self.fn(game, i), cnt)
+                cnt += 1
+
 if __name__ == '__main__':
     unittest.main()
