@@ -252,5 +252,15 @@ class TestValidateJump(unittest.TestCase):
         start = 46
         self.assertTrue(self.fn(game, 46, 74))
 
+class TestIsChecking(unittest.TestCase):
+    def setUp(self):
+        self.fn = game_logic.is_checking
+
+    def test_simple(self):
+        game = fen.deserialize_fen_string("12/12/3wbw6/12/12/12/12/12 12 8 b 0 0 1")
+        expected = [47]
+        result = self.fn(game, 46)
+        self.assertEqual(expected, result)
+
 if __name__ == '__main__':
     unittest.main()
