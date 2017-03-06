@@ -185,15 +185,16 @@ def is_friendly(game, square1, square2):
     """ Return whether both occupied and same owner """
     return check_attr(game, "occupied", True, square1, square2) and check_attr(game, "owner", game["board"][square1]["owner"], square2)
 
-# def check_sandwiches(game, square, opt=None):
-#     """ returns coord for squares of enemy pieces square is sandwiching """
+def check_sandwiches(game, square, opt=None):
+    """ returns coord for squares of enemy pieces square is sandwiching """
+    possible_partners = [square + 1, square - 1, square + game["row_width"], square - game["row_width"]]
 
 def is_sandwiched(game, square):
     """ returns int for number of pairs of enemy pieces sandwiching square """
-    pairs = [(square + 1, square - 1), (square + game["row_width"], square - game["row_width"])]
-    results = 0
+    pairs = [(square - 1, square + 1), (square - game["row_width"], square + game["row_width"])]
+    results = []
     for pair in pairs:
         if is_opposing(game, square, pair[0]) and is_friendly(game, *pair) \
         and (not game["rules"]["check"] or check_attr(game, "checked", False, *pair)):
-            results += 1
+            results.append(pair)
     return results

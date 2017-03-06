@@ -268,10 +268,11 @@ class TestIsSandwiched(unittest.TestCase):
 
     def test_is_sandwiched(self):
         game = fen.deserialize_fen_string("12/12/3wbw6/12/12/4w7/3wbw6/4w7 12 8 b 0 0 1")
-        cnt = 1
+        expected = [[(46, 48)], [(102, 104), (89, 117)]]
+        cnt = 0
         for i in range(len(game["board"])):
             if game["board"][i]["owner"] == 1:
-                self.assertEqual(self.fn(game, i), cnt)
+                self.assertEqual(self.fn(game, i), expected[cnt])
                 cnt += 1
 
 if __name__ == '__main__':
