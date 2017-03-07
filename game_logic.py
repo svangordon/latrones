@@ -1,14 +1,14 @@
 from string import ascii_lowercase
 
 
-def convert_alg_to_point(coord, board_width, board_height):
+def convert_alg_to_point(game, coord):
     col = int(ascii_lowercase.find(coord[0])) + 1 # dummy col
     row = int(coord[1:])
-    if not 0 < col <= board_width:
+    if not 0 < col <= game["board_width"]:
         raise ValueError('bad coord; invalid col in ' + coord)
-    if not 0 < row <= board_height:
+    if not 0 < row <= game["board_height"]:
         raise ValueError('bad coord; invalid row in ' + coord)
-    return row*(board_width + 2) + col
+    return row*(game["row_width"]) + col
 
 def convert_point_to_alg(coord, board_width, board_height):
     if coord - (board_width + 2) < 0 \
@@ -209,6 +209,7 @@ def clear_square(game, square):
     }
 
 def modify_game(game, move_start, move_end):
+    """ Returns modified game object w/ given move made """
     if game["rules"]["check"]:
         for square in is_checking(game, move_start, True):
             game["board"][square]["checked"] = False
@@ -224,3 +225,5 @@ def modify_game(game, move_start, move_end):
             for square in is_checking(game, neighbor, True):
                 game["board"][square]["checked"] = False
     return game
+
+# def make_move(fen_string, move_string):

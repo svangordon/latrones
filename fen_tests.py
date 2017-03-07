@@ -119,5 +119,30 @@ class TestSerializeFenString(unittest.TestCase):
         returned_board = fen.serialize_fen_string(fen.deserialize_fen_string(fen.create_fen(random_width, random_height)))
         self.assertEqual( returned_board.count('/') + 1, random_height)
 
+class TestMoveString(unittest.TestCase):
+    def setUp(self):
+        self.serialize = fen.serialize_move_string
+        self.deserialize = fen.deserialize_move_string
+
+    def test_serialize_simple(self):
+        move = ('a1', 'a2')
+        expected = 'a1 a2'
+        self.assertEqual(self.serialize(*move), expected)
+
+    def test_serialize_jumps(self):
+        move = ('a1', 'e1', 'c1')
+        expected = 'a1 c1 e1'
+        self.assertEqual(self.serialize(*move), expected)
+
+    def test_deserialize_simple(self):
+        expected = ('a1', 'a2')
+        move = 'a1 a2'
+        self.assertEqual(self.serialize(move), expected)
+
+    def test_deserialize_jumps(self):
+        expected = ('a1', 'e1', 'c1')
+        move = 'a1 c1 e1'
+        self.assertEqual(self.serialize(move), expected)
+
 if __name__ == '__main__':
     unittest.main()
