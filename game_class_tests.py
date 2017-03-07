@@ -16,5 +16,13 @@ class TestRules(unittest.TestCase):
         self.game.deserialize_rules("d,-4,T")
         self.assertEqual("d,-4,T", self.game.serialize_rules())
 
+class TestPieces(unittest.TestCase):
+    def setUp(self):
+        self.game = GameState("standard", True)
+
+    def test_deserialize(self):
+        self.game.deserialize_pieces("o/1101/1121/2222/2/f")
+        self.assertEqual(self.game.serialize_pieces(), "o/1101/1121/2222/2/f")
+
 if __name__ == '__main__':
     unittest.main()
