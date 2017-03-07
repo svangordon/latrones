@@ -138,31 +138,6 @@ def validate_move(game, *squares):
             return False
     return True
 
-# def make_move(game, move_start, move_end):
-#     """
-#     Return a new game object, updated for the move. Does not validate.
-#     """
-#     def is_checking(game, piece):
-#         """ Return coords for which a piece is part of the only pair checking """
-#         # square to check if occupied, square to check if friendly & not checked, two squares to check not friendly & not checked
-#         to_check = [
-#         (piece + 1, piece + 2, piece+1 - game["row_width"], piece+1 + game["row_width"]),
-#         (piece - 1, piece - 2, piece-1 - game["row_width"], piece-1 + game["row_width"]),
-#         (piece - game["row_width"], piece - game["row_width"]*2, piece-game["row_width"] - 1, piece-game["row_width"] + 1),
-#         (piece + game["row_width"], piece + game["row_width"]*2, piece+game["row_width"] - 1, piece+game["row_width"] + 1)
-#         ]
-#         results = []
-#         for squares in to_check:
-#             if check_attr(game, "occupied", True, squares[0]) \
-#             and not check_attr(game, "owner", game["board"][piece]["owner"], squares[0]) \
-#             and check_attr(game, "owner", game["board"][piece]["owner"], squares[1]) \
-#             and check_attr(game, "checked", False, squares[1]) \
-#             and not (check_attr(game, "owner", game["board"][piece]["owner"], squares[2], squares[3]) and check_attr(game, "checked", False, squares[2], squares[3])):
-#                 results.extend(squares[0])
-#         return results
-#
-#     if game["rules"]["check"]:
-
 def is_checking(game, piece, only_checker=False):
     """ Return coords for which a piece is checking, with flag for if we want
     stones for which it is part of the only pair checking """

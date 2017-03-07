@@ -182,7 +182,7 @@ def get_games_by_user(user_id, response=None):
 @hug.local()
 def get_moves_by_game(game_id):
     cur = cnx.cursor()
-    cur.execute(sql_templates["move"]["get_moves_by_game"].format(game_id=game_id))
+    cur.execute(sql_templates["move"]["get_moves"].format(game_id=game_id))
     row=cur.fetchall()
     cur.close()
     return row
@@ -210,6 +210,10 @@ def get_move(move_id):
     row = cur.fetchone()
     cur.close()
     return row
+
+@hug.local()
+def do_move(game_id, move_string):
+
 ###
 # Util Handlers
 ###

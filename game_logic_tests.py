@@ -105,37 +105,12 @@ class TestSquareConversion(unittest.TestCase):
 class TestIsMoveBackwards(unittest.TestCase):
     def setUp(self):
         self.fn = game_logic.is_backwards
-        # self.game = fen.deserialize_fen_string(fen.create_fen(8,12))
-# (move_start, move_end, active_player, board_width)
     def test_values(self):
         game = fen.deserialize_fen_string(fen.create_fen(12, 8))
         tests = [(False, (61, 75)), (False, (61, 62)), (False, (61, 60)), (True, (61, 47))]
         for test in tests:
             self.assertEqual(test[0], self.fn(game, *test[1]))
 
-# class TestValidateJump(unittest.TestCase):
-#     def setUp(self):
-#         self.fn = game_logic.validate_jump
-#         self.valid_fen = "12/12/3w8/3wb7/3w8/3B8/12/12 12 8 b 0 0 1"
-#         self.valid_dict = fen.deserialize_fen_string(self.valid_fen)
-#         self.invalid_fen = "12/12/3b8/3w8/3w8/3b8/12/12 12 8 b 0 0 1"
-#         self.invalid_dict = fen.deserialize_fen_string(self.invalid_fen)
-#
-#     def test_valid_jumps(self):
-#         start = 60
-#         jump_coords = [(60, 61, 62), (60, 46, 32), (60, 74, 88)]
-#         jump_coords = [(60, 61, 62)]
-#         for coord in jump_coords:
-#             self.assertTrue(self.fn(*coord, self.valid_dict))
-#
-#     def test_valid_setup(self):
-#         self.assertEqual(self.valid_dict["board"][60]["owner"], 0)
-#
-#     def test_invalid_jumps(self):
-#         # jump_coords = [(60, 61, 62), (60, 46, 32), (60, 74, 88)]
-#         jump_coords = [(60, 61, 62)]
-#         for coord in jump_coords:
-#             self.assertFalse(self.fn(*coord, self.invalid_dict))
 
 class TestCheckAdjacent(unittest.TestCase):
     def setUp(self):
