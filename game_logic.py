@@ -211,4 +211,13 @@ def make_move(fen_string, move_string):
     moves = list(map(convert_alg_to_point(game), move_string.split(' ')))
     if not validate_move(game, *moves):
         raise ValueError("Invalid move")
-    return serialize_fen_string(modify_game(game, moves[0], moves[-1]))
+    new_game = modify_game(game, moves[0], moves[-1])
+    if new_game["active_player"] == 1:
+        new_game["full_move_clock"] += 1
+    new_game["half_move_clock"] += 1
+    # (game_id, half_move_clock, notation, position)
+    return {
+        "half_move_clock": new_game["half_move_clock"],
+        "notation": move_string,
+        "position": serialize_fen_string(new_game)
+        }

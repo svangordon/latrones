@@ -6,6 +6,8 @@ import constants
 from constants import sql_templates
 import falcon
 
+from game_logic import make_move
+
 cnx = MySQLdb.connect(host="localhost", user="igoinu", passwd="password", db="latr")
 
 ###
@@ -213,6 +215,11 @@ def get_move(move_id):
 
 @hug.local()
 def do_move(game_id, move_string):
+    moves = get_moves_by_game(game_id)
+    fen_input = moves[-1][-1]
+    result = make_move(fen_input, move_string)
+    result["game_id"] = game_id
+    add_move(result)
 
 ###
 # Util Handlers
