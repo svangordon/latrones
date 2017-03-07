@@ -111,13 +111,16 @@ def check_piece_arrival(game, move_start, move_end):
         return False
     return True
 
-def validate_move(game, move_start, move_end, *jumps):
+def validate_move(game, *squares):
     """
     Validates move. Checks that check_piece_arrival returns true,
     that move start and end are valid, and that start is occupied.
     Then, if jumps, validates all jumps. If no jumps, checks is_backwards if not
     allow_backwards and then checks check_adjacent.
     """
+    move_start = squares[0]
+    move_end = squares[-1]
+    jumps = squares[1:-1]
     if not (check_piece_arrival(game, move_start, move_end) and \
     check_attr(game, "valid", True, move_start, move_end) and \
     check_attr(game, "occupied", True, move_start)):
@@ -226,4 +229,5 @@ def modify_game(game, move_start, move_end):
                 game["board"][square]["checked"] = False
     return game
 
-# def make_move(fen_string, move_string):
+def make_move(fen_string, move_string):
+    move = move_string.split(' ')
