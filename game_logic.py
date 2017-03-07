@@ -111,7 +111,7 @@ def check_piece_arrival(game, move_start, move_end):
         return False
     return True
 
-def validate_move(game, move_start, move_end, jumps=None):
+def validate_move(game, move_start, move_end, *jumps):
     """
     Validates move. Checks that check_piece_arrival returns true,
     that move start and end are valid, and that start is occupied.
