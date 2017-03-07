@@ -275,19 +275,19 @@ class TestIsSandwiched(unittest.TestCase):
                 self.assertEqual(self.fn(game, i), expected[cnt])
                 cnt += 1
 
-class TestMakeMove(unittest.TestCase):
+class TestModifyGame(unittest.TestCase):
     def setUp(self):
-        self.make_move = game_logic.make_move
+        self.make_move = game_logic.modify_game
 
     def execute_test(self, move_start, move_end, fen_start, fen_end):
         game = fen.deserialize_fen_string("12/12/3wBw6/12/12/4w7/3wbw6/4w7 12 8 b 0 0 1")
-        self.make_move(game, move_start, move_end)
+        self.modify_game(game, move_start, move_end)
         return (fen_end, fen.serialize_fen_string(game))
 
     def test_simple_move(self):
         game = fen.deserialize_fen_string("12/12/3wBw6/12/12/4w7/3wbw6/4w7 12 8 b 0 0 1")
         expected = "12/3w8/4bw6/12/12/4w7/3wbw6/4w7 12 8 b 0 0 1"
-        self.make_move(game, 46, 32)
+        self.modify_game(game, 46, 32)
         self.assertEqual(expected, fen.serialize_fen_string(game))
 
     def test_execute_test(self):

@@ -161,3 +161,14 @@ def serialize_board_string(board_list):
         else:
             raise ValueError('fell through unexpectedly')
     return ''.join(output)
+
+def deserialize_move_string(move_string):
+    split = move_string.split(' ')
+    return (split[0], split[-1], split[1:-1])
+
+def serialize_move_string(move_tuple):
+    try:
+      jumps = ' '.join(move_tuple[2])
+    except IndexError:
+      jumps = []
+    return ' '.join([move_tuple[0], jumps, move_tuple[1]])

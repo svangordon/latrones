@@ -208,7 +208,7 @@ def clear_square(game, square):
         "valid": True
     }
 
-def make_move(game, move_start, move_end):
+def modify_game(game, move_start, move_end):
     if game["rules"]["check"]:
         for square in is_checking(game, move_start, True):
             game["board"][square]["checked"] = False
@@ -223,3 +223,4 @@ def make_move(game, move_start, move_end):
             game["board"][neighbor][checked] = True
             for square in is_checking(game, neighbor, True):
                 game["board"][square]["checked"] = False
+    return game
