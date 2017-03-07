@@ -12,7 +12,7 @@ class TestSquareConversion(unittest.TestCase):
         square = 'e4'
         # board_width = 12
         board_height = 8
-        resp = game_logic.convert_alg_to_point(self.game, square)
+        resp = game_logic.convert_alg_to_point(self.game)(square)
         expected_resp = 61
         self.assertEqual(expected_resp, resp)
     #
@@ -302,7 +302,7 @@ class TestMakeMove(unittest.TestCase):
     def test_simple_move(self):
         start = "w7/8/8/8/8/8/8/8/8/8/8/8 8 12 w 0 0 1"
         end = "8/w7/8/8/8/8/8/8/8/8/8/8 8 12 w 0 0 1"
-        move = "a1 b1"
+        move = "a1 a2"
         self.assertEqual(self.make_move(start, move), end)
 if __name__ == '__main__':
     unittest.main()

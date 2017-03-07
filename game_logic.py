@@ -1,14 +1,16 @@
 from string import ascii_lowercase
 from fen import serialize_fen_string, deserialize_fen_string
 
-def convert_alg_to_point(game, coord):
-    col = int(ascii_lowercase.find(coord[0])) + 1 # dummy col
-    row = int(coord[1:])
-    if not 0 < col <= game["board_width"]:
-        raise ValueError('bad coord; invalid col in ' + coord)
-    if not 0 < row <= game["board_height"]:
-        raise ValueError('bad coord; invalid row in ' + coord)
-    return row*(game["row_width"]) + col
+def convert_alg_to_point(game):
+    def curried(coord):
+        col = int(ascii_lowercase.find(coord[0])) + 1 # dummy col
+        row = int(coord[1:])
+        if not 0 < col <= game["board_width"]:
+            raise ValueError('bad coord; invalid col in ' + coord)
+        if not 0 < row <= game["board_height"]:
+            raise ValueError('bad coord; invalid row in ' + coord)
+        return row*(game["row_width"]) + col
+    return curried
 
 def convert_point_to_alg(coord, board_width, board_height):
     if coord - (board_width + 2) < 0 \
@@ -230,8 +232,8 @@ def modify_game(game, move_start, move_end):
     return game
 
 def make_move(fen_string, move_string):
-    moves = map(convert_alg_to_point, move_string.split(' '))
     game = deserialize_fen_string(fen_string)
+    moves = list(map(convert_alg_to_point(game), move_string.split(' ')))
     if not validate_move(game, *moves):
         raise ValueError("Invalid move")
     return serialize_fen_string(modify_game(game, moves[0], moves[-1]))
