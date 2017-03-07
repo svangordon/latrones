@@ -152,3 +152,58 @@ squares look like:
 
   On multiple piece types: if we want "officers" and "ordinarii", represent check with a ' (or other char)
   before the piece in the fen.
+
+  I'm getting a little bit hung up on rules. I think that I may need to make a thorough accounting of what
+  rules we want to account for.
+  -- Multiple piece types (ordinarii, "officers", "king", "city")
+  -- different capture conditions for piece: surround on n sides for capture, or simple enter to capture
+  -- Multiple move types (rook-like, or single step)
+  -- different capture types: displacement, custodial, delayed custodial
+  -- optional use of a binding "check"
+  -- different win conditions: reduce to one piece, capture n pieces, capture "city" or "king"
+  -- "tandem move", allowing rectangles (or possibly just squares) of pieces to move as one
+  -- allowing or disallowing jumping
+  -- allowing or disallowing backwards moves
+
+"Chogo 44" is someone else's attempt to recreate LL, and I agree with a number of their ideas
+
+So one of the big things here is that we can have pieces keep track of themselves, as well
+as their own move validation.
+
+Okay, there might be a little bit too much going on here? maybe, maybe not.
+
+I'm going to delay implementation of delayed custodial capture, b/c i don't want
+to write the extra code for that
+
+game-wide rules:
+  -- capture conditions
+  -- use of check (which i should really rename "trap")
+  -- win conditions
+  -- phalanx move (i'm going to dead this for now; too much extra work)
+cap: [d|c|dC] for displacement, custodial, delayed custodial
+win: [int|-int|char] # a player loses when they have int or fewer pieces remaining. 0 if it's win by capturing k
+trap: T|t for whether using trap (yes, no)
+phalanx: P|p for whether using phalanx(yes, no)
+ex:
+d-4Tp for displacement capture, win on capture 4 enemy stones, using Trapping, no phalanx
+
+[fen_as_conventionally_defined] [rules_string] [piece definitions]
+
+piece definitions:
+  -- piece_char
+  -- move_step (either unlimited or 1) : 0: none, 1: 1, 2: unlimited
+  -- free_move_list [move_forwards, move_right, move_backwards, move_left]
+  -- trapped_move_list [] : not necessary
+  -- free_jump_list [] | 0: no jump, 1: jump anything, 2: jump only friendly
+  -- trapped_jump_list
+  -- sides_to_trap/cap
+  -- lose_on_capture t/f
+ex:
+ordinarii:
+o,fM|1101,fJ|1121,tJ|2222,2,f
+equestrian:
+e,fM|2222,fJ|1111,tJ|2222,2,f
+king:
+k,fM|2222,fJ|1111,tJ|1111,4,t
+
+[piece_char][]
