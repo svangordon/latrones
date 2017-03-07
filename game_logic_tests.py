@@ -294,5 +294,15 @@ class TestModifyGame(unittest.TestCase):
     def test_execute_test(self):
         var = (46, 32, "12/12/3wBw6/12/12/4w7/3wbw6/4w7 12 8 b 0 0 1", "12/3w8/4bw6/12/12/4w7/3wbw6/4w7 12 8 b 0 0 1")
         self.assertEqual(*self.execute_test(*var))
+
+class TestMakeMove(unittest.TestCase):
+    def setUp(self):
+        self.make_move = game_logic.make_move
+
+    def test_simple_move(self):
+        start = "w7/8/8/8/8/8/8/8/8/8/8/8 8 12 w 0 0 1"
+        end = "8/w7/8/8/8/8/8/8/8/8/8/8 8 12 w 0 0 1"
+        move = "a1 b1"
+        self.assertEqual(self.make_move(start, move), end)
 if __name__ == '__main__':
     unittest.main()
