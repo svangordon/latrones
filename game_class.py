@@ -295,7 +295,7 @@ class GamePiece:
             raise ValueError("Attmepting to move trapped piece")
 
         for square in squares:
-            if not board[square]["valid"] == True:
+            if not board[square].valid == True:
                 raise ValueError("Invalid square")
 
         if len(squares) >= 2:
