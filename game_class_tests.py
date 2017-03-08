@@ -28,8 +28,8 @@ class TestDetermineDirection(unittest.TestCase):
 
 class TestHandleMove(unittest.TestCase):
     def setUp(self):
-        self.game = GameState("standard", True)
-        self.game.gen.piece('o', 30)
+        self.game = GameState("12/1o10/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f")
+        # self.game.gen.piece('o', 30)
 
     def test_fen(self):
         self.game.handle_move("b2 c2")

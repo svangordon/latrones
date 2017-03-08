@@ -3,7 +3,7 @@ from string import ascii_lowercase
 class GameState:
 
     fen_strings = {
-        "standard": "12/12/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f" #seperate pieces w/ comma
+        "standard": "12/12/12/12/12/12/12/12,0,0,0 12,8,12,d,-4,T o/1101/1121/2/f" #seperate pieces w/ comma
     }
 
     turn_cols = ('board', 'active_player', 'half_move_clock', 'full_move_clock')
@@ -110,13 +110,15 @@ class GameState:
         board_string = self.turn["board"]
         self.turn["board"] = {}
         passed_one_flag = False
-        coord_counter = 0
-        checked_flag = False
+        pointer = 0
+        trapped_flag = False
         def add_square(square_type):
-            nonlocal coord_counter, checked_flag
-            self.gen.piece(square_type, coord_counter, checked_flag)
-            checked_flag = False
-            coord_counter += 1
+            nonlocal pointer, trapped_flag
+            # if pointer == 30:
+            #     raise ValueError('======', square_type, pointer, trapped_flag, '=====')
+            self.gen.piece(square_type, pointer, trapped_flag)
+            trapped_flag = False
+            pointer += 1
         for i in range(self.rules["row_len"]):
             add_square("invalid")
         for row in board_string.split('/'):
@@ -128,7 +130,7 @@ class GameState:
                         continue
                     squares_to_add = int(char)
                     if passed_one_flag:
-                        squares_to_add += 10
+                        squares_to_add += 9
                         passed_one_flag = False
                     elif int(char) == 1:
                         passed_one_flag = True
@@ -136,6 +138,8 @@ class GameState:
                         add_square("empty")
                 except ValueError:
                     passed_one_flag = False
+                    # if pointer == 30:
+                        # raise ValueError('======', char, '=====')
                     add_square(char)
             add_square("invalid")
         for i in range(self.rules["row_len"]):
@@ -205,6 +209,7 @@ class PieceGenerator:
         self.pieces[props["char"]] = props
 
     def piece(self, piece_name, position, trapped=False):
+        # raise ValueError(self.pieces)
         props = dict(self.pieces[piece_name.lower()])
         if piece_name not in ["invalid", "empty"]:
             if piece_name.islower():
@@ -214,6 +219,8 @@ class PieceGenerator:
         else:
             props["owner"] = None
         props["trapped"] = trapped
+        # if position == 30:
+            # raise ValueError('===', props, '===')
         # print("===", , "===")
         self.game.turn["board"][position] = GamePiece(self.game, props, position)
         # return GamePiece(self.game, props, position)
@@ -231,6 +238,12 @@ class GamePiece:
             self.char = props["char"]
             self.move_pattern = props["move_pattern"]
             self.jump_pattern = props["jump_pattern"]
+        else:
+            self.owner = None
+            self.trapped = None
+            self.char = None
+            self.move_pattern = None
+            self.jump_pattern = None
 
     def determine_direction(self, coord_1, coord_2=None):
         """ return which cardinal direction a move is in """
@@ -261,16 +274,16 @@ class GamePiece:
             return 1
         else:
             raise ValueError("couldn't set direction")
-        if start - row_step <= end:
-            return 0
-        elif start + row_step >= end:
-            return 2
-        elif origin_square.position - row_step < end_square.position < origin_square.position:
-            return 1 # might be wrong on this?
-        elif origin_square.position + row_step > end_square.position > origin_square.position:
-            return 3
-        else:
-            raise ValueError("tried to find direction and failed")
+        # if start - row_step <= end:
+        #     return 0
+        # elif start + row_step >= end:
+        #     return 2
+        # elif origin_square.position - row_step < end_square.position < origin_square.position:
+        #     return 1 # might be wrong on this?
+        # elif origin_square.position + row_step > end_square.position > origin_square.position:
+        #     return 3
+        # else:
+        #     raise ValueError("tried to find direction and failed")
 
     def make_move(self, *squares):
         self.validate_move(*squares)
@@ -290,6 +303,7 @@ class GamePiece:
 
     def add_self(self, square):
         self.position = square
+        print([neighbor for neighbor in self.get_neighbors()])
         [neighbor.sandwich() for neighbor in self.get_neighbors() if self.position in neighbor.get_sandwichers()]
         self.game.turn["board"][self.position] = self
 
@@ -316,7 +330,7 @@ class GamePiece:
         # origin_square = board[squares[0]]
         end_square = board[squares[-1]]
         if not self.owner == self.game.turn["active_player"]:
-            raise ValueError("Moving piece not owned by active_player")
+            raise ValueError("Moving piece not owned by active_player", self.owner, self.game.turn["active_player"], vars(self))
 
         if self.game.rules["trapping"] and self.trapped and not len(squares) >= 3:
             raise ValueError("Attmepting to move trapped piece")
@@ -406,13 +420,14 @@ class GamePiece:
 
     def get_neighbors(self):
         """ Return list of references to neighboring squares, starting at north and going clockwise """
+        # print([self.position - self.game.rules["row_len"], self.position + 1, self.position + self.game.rules["row_len"], self.position - 1])
         return list(map(self.game.square, [self.position - self.game.rules["row_len"], self.position + 1, self.position + self.game.rules["row_len"], self.position - 1]))
 
     def get_sandwichers(self):
         """ returns tuples enemy pieces sandwiching square """
         # pairs = [(square - 1, square + 1), (square - game["row_width"], square + game["row_width"])]
-        resultes = []
-        neighbors = self.neighbors()
+        results = []
+        neighbors = self.get_neighbors()
         pairs = ((neighbors[0], neighbors[2]), (neighbors[1], neighbors[3]))
         for pair in pairs:
             if self.owner != pair[0].owner and pair[0].occupied and pair[1].owner == pair[2].owner \
