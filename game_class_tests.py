@@ -6,17 +6,19 @@ class TestRules(unittest.TestCase):
     def setUp(self):
         self.game = GameState("standard", True)
         self.game.gen.piece('o', 15)
-        self.test_vals = [(15,16,2), 15,29,3]
+        self.test_vals = [(30,44,0), (30,31,1), (30,16,2), (30,29,3)]
 
     def test_determine_direction_e(self):
         """ should find eastward direction ok """
-        test_vals = self.test_vals[0]
+        test_vals = self.test_vals[]
         self.assertEqual(self.game.square(test_vals[0]).determine_direction(test_vals[1]), test_vals[2])
 
     def test_determine_direction_s(self):
         """ should find eastward direction ok """
-        test_vals = self.test_vals[1]
+        test_vals = self.test_vals[0]
         self.assertEqual(self.game.square(test_vals[0]).determine_direction(test_vals[1]), test_vals[2])
+
+
 
     # def test_basic(self):
         # self.game.handle_move(15, 16)
