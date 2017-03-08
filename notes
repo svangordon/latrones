@@ -194,16 +194,21 @@ piece definitions:
   -- move_step (either unlimited or 1) : 0: none, 1: 1, 2: unlimited
   -- free_move_list [move_forwards, move_right, move_backwards, move_left]
   -- trapped_move_list [] : not necessary
-  -- free_jump_list [] | 0: no jump, 1: jump anything, 2: jump only friendly
+  -- jump_list [] | 0: no jump, 1: jump anything, 2: jump only friendly
+  -- allow_jump_friendly_while_trapped J: True j: False
   -- trapped_jump_list
   -- sides_to_trap/cap
   -- lose_on_capture t/f
-ex:
+old_notation:
 ordinarii:
 o,fM|1101,fJ|1121,tJ|2222,2,f
 equestrian:
 e,fM|2222,fJ|1111,tJ|2222,2,f
 king:
 k,fM|2222,fJ|1111,tJ|1111,4,t
+
+new_notation(19:17 3/7/17):
+ordinarii:
+o,1101,1121,J,2,f
 
 [piece_char][]
