@@ -156,7 +156,7 @@ class GameState:
 
     def serialize_board_string(self):
         output = ''
-        pointer = self.turn["row_len"] + 1
+        pointer = self.rules["row_len"] + 1
         consecutive_empty = 0
         for i in self.rules["board_height"]:
             for k in self.rules["board_width"]:
