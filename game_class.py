@@ -107,11 +107,14 @@ class GameState:
     def deserialize_board_string(self):
         # output = []
         board_string = self.turn["board"]
+        self.turn["board"] = {}
         passed_one_flag = False
         coord_counter = 0
+        checked_flag = False
         def add_square(square_type):
-            nonlocal coord_counter
-            self.gen.piece(square_type, coord_counter)
+            nonlocal coord_counter, checked_flag
+            self.gen.piece(square_type, coord_counter, checked_flag)
+            checked_flag = False
             coord_counter += 1
         for i in range(self.rules["row_len"]):
             add_square("invalid")
@@ -119,6 +122,9 @@ class GameState:
             add_square("invalid")
             for char in row:
                 try:
+                    if char == '*':
+                        checked_flag = True
+                        continue
                     squares_to_add = int(char)
                     if passed_one_flag:
                         squares_to_add += 10
@@ -182,11 +188,11 @@ class PieceGenerator:
 
     def add_piece(self, input_props):
         props = dict(input_props)
-        props["empty"] = False
-        props["invalid"] = False
+        props["occupied"] = True
+        props["valid"] = True
         self.pieces[props["char"]] = props
 
-    def piece(self, piece_name, position):
+    def piece(self, piece_name, position, trapped=False):
         props = dict(self.pieces[piece_name.lower()])
         if piece_name not in ["invalid", "empty"]:
             if piece_name.islower():
@@ -195,7 +201,10 @@ class PieceGenerator:
                 props["owner"] = 1
         else:
             props["owner"] = None
-        return GamePiece(self.game, props, position)
+        props["trapped"] = trapped
+        # print("===", , "===")
+        self.game.turn["board"][position] = GamePiece(self.game, props, position)
+        # return GamePiece(self.game, props, position)
 
 class GamePiece:
     def __init__(self, game, props, position):
@@ -204,12 +213,12 @@ class GamePiece:
         self.position = position
         self.occupied = props["occupied"]
         self.valid = props["valid"]
-        self.owner = props["owner"]
-        self.trapped = props["trapped"]
-        self.char = props["char"]
-        self.move_pattern = props["move"]
-        self.jump_pattern = props["jumps"]
-        self.trapped_jump_pattern = props["trapped_jump_pattern"]
+        if self.occupied:
+            self.owner = props["owner"]
+            self.trapped = props["trapped"]
+            self.char = props["char"]
+            self.move_pattern = props["move_pattern"]
+            self.jump_pattern = props["jump_pattern"]
 
     def determine_direction(self, coord1, coord2=None):
         """ return which cardinal direction a move is in """
@@ -279,7 +288,7 @@ class GamePiece:
         board = self.game.turn["board"]
         # origin_square = board[squares[0]]
         end_square = board[squares[-1]]
-        if not self.owner == self.turn["active_player"]:
+        if not self.owner == self.game.turn["active_player"]:
             raise ValueError("Moving piece not owned by active_player")
 
         if self.game.rules["trapping"] and self.trapped and not len(squares) >= 3:

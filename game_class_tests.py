@@ -7,7 +7,7 @@ class TestRules(unittest.TestCase):
         self.game = GameState("standard", True)
 
     def test_basic(self):
-        self.game.make_move("a1 a2")
+        self.game.handle_move(15, 16)
 
     # def test_deserialize_rules(self):
     #     self.game.deserialize_rules("d,-4,T")
