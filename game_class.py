@@ -29,6 +29,10 @@ class GameState:
         # self.deserialize_rules(rules)
         # self.deserialize_pieces(pieces)
 
+    def serialize_fen_string(self):
+        self.serialize_turn_string()
+        self.fen_string = ' '.join(self.turn_string, self.rules_string, self.pieces_string)
+
     def empty_square(self, square):
         self.gen.piece("empty", square)
 
@@ -147,6 +151,9 @@ class GameState:
         # # And now, overwrite state
         # self.game.turn["board"] = output
 
+    def serialize_turn_string(self):
+        self.turn_string = ','.join([self.serialize_board_string(), self.turn["active_player"], self.turn["half_move_clock"], self.turn["full_move_clock"]])
+
     def serialize_board_string(self):
         output = ''
         pointer = self.turn["row_len"] + 1
@@ -173,7 +180,7 @@ class GameState:
         self.board_string = output
 
     def handle_move(self, move_string):
-        """ a shitty version of what the eventual move handler will be """
+        """ an okay version of what the eventual move handler will be """
         def map_move(move):
             col = int(ascii_lowercase.find(move[0])) + 1 # dummy col
             row = int(move[1:])
@@ -185,7 +192,7 @@ class GameState:
         move = list(map(map_move,move_string.split(' ')))
         self.turn["board"][move[0]].make_move(*move[1:])
 
-        self.turn["board"][move_start].make_move(move_end)
+        # self.turn["board"][move_start].make_move(move_end)
 
 class PieceGenerator:
     """ holds a reference to game, spits out different types of pieces """
