@@ -30,7 +30,7 @@ class GameState:
         # self.deserialize_pieces(pieces)
 
     def empty_square(self, square):
-        self.turn["board"][square] = self.gen.piece("empty", square)
+        self.gen.piece("empty", square)
 
     def square(self, square):
         return self.turn["board"][square]
@@ -219,10 +219,10 @@ class PieceGenerator:
         else:
             props["owner"] = None
         props["trapped"] = trapped
-        # if position == 30:
-            # raise ValueError('===', props, '===')
         # print("===", , "===")
         self.game.turn["board"][position] = GamePiece(self.game, props, position)
+        # if position == 30:
+            # raise ValueError('===', GamePiece(self.game, props, position), '===')
         # return GamePiece(self.game, props, position)
 
 class GamePiece:
