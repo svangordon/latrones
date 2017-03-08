@@ -1,23 +1,25 @@
-self.game["rules"]["row_len"]class GameState:
+class GameState:
 
     fen_strings = {
-        "standard": "12/12/12/12/12/12/12/12,,w,12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f" #seperate pieces w/ comma
+    #Make sure to change this back!
+        "standard": "o11/12/12/12/12/12/12/12,w,12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f" #seperate pieces w/ comma
     }
 
-    turn_cols = ('board', , 'active_player', 'stone_count', 'half_move_clock', 'full_move_clock')
+    turn_cols = ('board', 'active_player', 'stone_count', 'half_move_clock', 'full_move_clock')
     rules_cols = ('board_width', 'board_height', 'stone_count','capture', 'win_condition', 'trapping')
+    piece_cols = ('char', "move_pattern", "jump_pattern", "sides_to_capture", "lose_on_capture")
 
     def __init__(self, fen_string, init=False):
         self.turn = {}
         self.rules = {}
         self.pieces = {}
         if init:
-            fen_string = fen_strings[fen_string]
+            fen_string = self.fen_strings[fen_string]
         split_string = fen_string.split(' ')
         # board = split_string[0]
         # rules = split_string[1]
         # pieces = split_string[2]
-        self.game_string = split_string[0]
+        self.turn_string = split_string[0]
         self.rules_string = split_string[1]
         self.pieces_string = split_string[2]
         self.deserialize_rules()
@@ -46,7 +48,7 @@ self.game["rules"]["row_len"]class GameState:
         rules["board_width"] = int(rules["board_width"])
         rules["board_height"] = int(rules["board_height"])
         rules["stone_count"] = int(rules["stone_count"])
-        rules["capture_method"] = capture_methods[rules[0]]
+        rules["capture"] = capture_methods[rules["capture"]]
         rules["win_condition"] = int(rules["win_condition"])
         rules["trapping"] = trapping[rules["trapping"]]
         rules["row_len"] = rules["board_width"] + 2
@@ -63,17 +65,21 @@ self.game["rules"]["row_len"]class GameState:
             True: "T",
             False: "t"
         }
-        rules.append(capture_methods[self.rules["capture_method"]])
+        rules.append(capture_methods[self.rules["capture"]])
         rules.append(str(self.rules["win_condition"]))
         rules.append(trapping[self.rules["trapping"]])
         return ','.join(rules)
 
     def deserialize_pieces(self):
         """ add all of the piece strings into self.gen """
-        pieces_dict = {}
+        # pieces_dict = {}
         self.gen = PieceGenerator(self)
         for piece_string in self.pieces_string.split(','):
-            self.gen.add_piece(piece_string)
+            piece_dict = dict(zip(self.piece_cols, piece_string.split('/')))
+            piece_dict["move_pattern"] = [int(num) for num in piece_dict["move_pattern"].split()]
+            piece_dict["jump_pattern"] = [int(num) for num in piece_dict["jump_pattern"].split()]
+            piece_dict["lose_on_capture"] = piece_dict["lose_on_capture"].isupper()
+            self.gen.add_piece(piece_dict)
             # pieces_dict[piece_string[0]] = PieceGenerator(self, piece_string)
         # self.pieces_dict = pieces_dict
 
@@ -94,18 +100,18 @@ self.game["rules"]["row_len"]class GameState:
 
         # def deserialize_board_string(board_string)
 
-        self.turn = dict(zip(self.columns, map(fen_map, self.turn_string.split(','))))
+        self.turn = dict(zip(self.turn_cols, map(fen_map, self.turn_string.split(','))))
         self.board_string = self.turn["board"]
         self.deserialize_board_string()
 
     def deserialize_board_string(self):
-        output = []
+        # output = []
         board_string = self.turn["board"]
-        assert isinstance(board_string, str)
         passed_one_flag = False
         coord_counter = 0
         def add_square(square_type):
-            output.append(self.gen.piece(square_type), coord_counter)
+            nonlocal coord_counter
+            self.gen.piece(square_type, coord_counter)
             coord_counter += 1
         for i in range(self.rules["row_len"]):
             add_square("invalid")
@@ -127,8 +133,8 @@ self.game["rules"]["row_len"]class GameState:
             add_square("invalid")
         for i in range(self.rules["row_len"]):
             add_square("invalid")
-        # And now, overwrite state
-        self.game.turn["board"] = output
+        # # And now, overwrite state
+        # self.game.turn["board"] = output
 
     def serialize_board_string(self):
         output = ''
@@ -155,30 +161,39 @@ self.game["rules"]["row_len"]class GameState:
             pointer += self.turn["row_len"]
         self.board_string = output
 
+    def handle_move(self, move_start, move_end):
+        """ a shitty version of what the eventual move handler will be """
+        self.turn["board"][move_start].make_move(move_end)
+
 class PieceGenerator:
     """ holds a reference to game, spits out different types of pieces """
     def __init__(self, game):
         self.game = game
         self.pieces = {
             "invalid": {
-                "invalid": True,
+                "valid": False,
                 "occupied": False
             },
             "empty": {
-                "invalid": False,
+                "valid": True,
                 "occupied": False
             }
         }
 
-    def add_piece(self, char, input_props):
+    def add_piece(self, input_props):
         props = dict(input_props)
         props["empty"] = False
         props["invalid"] = False
-        self.pieces[char] = props
+        self.pieces[props["char"]] = props
 
     def piece(self, piece_name, position):
-        props = dict(self.pieces[piece_name])
-        return GamePiece(game, props, position)
+        props = dict(self.pieces[piece_name.lower()])
+        if piece_name not in ["invalid", "empty"]:
+            if piece_name.islower():
+                props["owner"] = 0
+            else:
+                props["owner"] = 1
+        return GamePiece(self.game, props, position)
 
 class GamePiece:
     def __init__(self, game, props, position):
@@ -221,16 +236,17 @@ class GamePiece:
 
     def make_move(self, *squares):
         self.validate_move(*squares)
-        self.remove_piece(squares[0])
-        self.add_piece(squares[-1])
+        self.remove_self()
+        self.add_self(squares[-1])
+        # self.remove_piece(squares[0])
+        # self.add_piece(squares[-1])
 
     def remove_self(self):
         """ The piece removes itself, untrapping if necessary.
         Probably should move this to the game class, but it works here.
         """
         if self.game.rules["trapping"]:
-            for trapped_neighbor in [neighbor for neighbor in self.get_neighbors() if neighbor.trapped and self.position in neighbor.get_sandwichers() and len(neighbor.get_sandwichers()) == 2]
-                trapped_neighbor.untrap()
+            [neighbor.untrap() for neighbor in self.get_neighbors() if neighbor.trapped and self.position in neighbor.get_sandwichers() and len(neighbor.get_sandwichers()) == 2]
         self.game.empty_square(self.position)
         self.position = None
 
@@ -241,10 +257,10 @@ class GamePiece:
 
     def sandwich(self):
         """ The piece handles itself being sandwiched """
-        if self.game.rules["capture_method"] == "custodial_capture":
+        if self.game.rules["capture"] == "custodial_capture":
             self.remove_self()
         if self.game.rules["trapping"]:
-            for trapped_neighbor in [neighbor for neighbor in self.get_neighbors() if neighbor.trapped and self.position in neighbor.get_sandwichers() and len(neighbor.get_sandwichers()) == 2]
+            for trapped_neighbor in [neighbor for neighbor in self.get_neighbors() if neighbor.trapped and self.position in neighbor.get_sandwichers() and len(neighbor.get_sandwichers()) == 2]:
                 trapped_neighbor.untrap()
         self.trap()
 
@@ -252,16 +268,16 @@ class GamePiece:
         self.trapped = False
 
     def trap(self):
-        [neighbor.untrap() for neighbor in self.neighbors() if  ]
+        [neighbor.untrap() for neighbor in self.neighbors() if neighbor.trapped and self.position in neighbor.get_sandwichers() and len(neighbor.get_sandwichers()) == 2]
         # self.trapped = True
         # self.checked = True
 
 
     def validate_move(self, *squares):
         board = self.game.turn["board"]
-        origin_square = board[squares[0]]
+        # origin_square = board[squares[0]]
         end_square = board[squares[-1]]
-        if not origin_square["owner"] == self.turn["active_player"]:
+        if not self.owner == self.turn["active_player"]:
             raise ValueError("Moving piece not owned by active_player")
 
         if self.game.rules["trapping"] and self.trapped and not len(squares) >= 3:
@@ -271,14 +287,15 @@ class GamePiece:
             if not board[square]["valid"] == True:
                 raise ValueError("Invalid square")
 
-        if len(squares) > 2:
-            for square in squares [1:-1]:
+        if len(squares) >= 2:
+            for square in squares [:-1]:
                 if self.game["board"][square]["occupied"]:
                     raise ValueError("attempting to jump through occupied square")
+            self.validate_jump(self.position, squares[0])
             for i in range(1, len(squares)):
                 self.validate_jump(squares[i - 1], squares[i])
         else:
-            self.validate_non_jump(*squares)
+            self.validate_non_jump(squares)
         # passed all the tests
         return True
 
@@ -292,7 +309,7 @@ class GamePiece:
             jumped_coord = start_square - 1
         elif end_coord == start_square - self.game.turn["row_len"]*2:
             jumped_coord = start_square - self.game.turn["row_len"]
-        elif end_coord == start_square + self.game.turn["row_len"]*2
+        elif end_coord == start_square + self.game.turn["row_len"]*2:
             jumped_coord == start_square + self.game.turn["row_len"]
         else:
             raise ValueError("bad jump coord")
@@ -318,8 +335,8 @@ class GamePiece:
         if not end_square.valid:
             raise ValueError("attempting to enter invalid square")
         if end_square.occupied:
-            if not self.rules["capture_method"] == "displacement":
-                raise ValueError("Moving to occupied square, but capture_method != displacement")
+            if not self.rules["capture"] == "displacement":
+                raise ValueError("Moving to occupied square, but capture != displacement")
             if self.rules["trapping"] and not end_square["trapped"]:
                 raise ValueError("Moving to occupied square, but end_square is not trapped")
 
