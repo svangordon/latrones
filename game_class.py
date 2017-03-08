@@ -31,7 +31,7 @@ class GameState:
 
     def serialize_fen_string(self):
         self.serialize_turn_string()
-        self.fen_string = ' '.join(self.turn_string, self.rules_string, self.pieces_string)
+        self.fen_string = ' '.join([self.turn_string, self.rules_string, self.pieces_string])
 
     def empty_square(self, square):
         self.gen.piece("empty", square)
@@ -152,15 +152,16 @@ class GameState:
         # self.game.turn["board"] = output
 
     def serialize_turn_string(self):
-        self.turn_string = ','.join([self.serialize_board_string(), self.turn["active_player"], self.turn["half_move_clock"], self.turn["full_move_clock"]])
+        self.serialize_board_string()
+        self.turn_string = ','.join(list(map(str, [self.board_string, self.turn["active_player"], self.turn["half_move_clock"], self.turn["full_move_clock"]])))
 
     def serialize_board_string(self):
         output = ''
         pointer = self.rules["row_len"] + 1
         consecutive_empty = 0
-        for i in self.rules["board_height"]:
-            for k in self.rules["board_width"]:
-                if not self.turn["board"][pointer]["occupied"]:
+        for _ in range(self.rules["board_height"]):
+            for __ in range(self.rules["board_width"]):
+                if not self.turn["board"][pointer].occupied:
                     consecutive_empty += 1
                 else:
                     if consecutive_empty:
@@ -176,7 +177,7 @@ class GameState:
                 consecutive_empty = 0
             output += '/'
             pointer -= self.rules["board_width"]
-            pointer += self.turn["row_len"]
+            pointer += self.rules["row_len"]
         self.board_string = output
 
     def handle_move(self, move_string):
