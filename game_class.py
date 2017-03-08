@@ -370,7 +370,7 @@ class GamePiece:
 
     def validate_square_entry(self, end_coord):
         """ Validate whether the piece can enter a given square, based on what's already there"""
-        end_square = self.game.turn["board"]
+        end_square = self.game.turn["board"][end_coord]
         if not end_square.valid:
             raise ValueError("attempting to enter invalid square")
         if end_square.occupied:
@@ -382,7 +382,6 @@ class GamePiece:
     def validate_non_jump(self, end_coord):
         direction = self.determine_direction(end_coord)
         move_pattern = self.move_pattern if self.owner == 0 else reverse(self.move_pattern)
-        print('===', 'move_pattern', move_pattern, len(move_pattern))
         if not move_pattern[int(direction)]:
             raise ValueError("attempting non-jump in invalid direction")
 
