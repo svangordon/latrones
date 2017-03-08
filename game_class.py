@@ -167,11 +167,12 @@ class GameState:
                     if consecutive_empty:
                         output += str(consecutive_empty)
                         consecutive_empty = 0
-                    char = self.turn["board"][pointer]["char"]
-                    if self.turn["board"][pointer]["owner"] == 0:
-                        output += self.turn["board"][pointer]["char"].lower()
+                    char = self.turn["board"][pointer].char
+                    if self.turn["board"][pointer].owner == 0:
+                        output += self.turn["board"][pointer].char.lower()
                     else:
-                        output += self.turn["board"][pointer]["char"].upper()
+                        output += self.turn["board"][pointer].char.upper()
+                pointer += 1
             if consecutive_empty:
                 output += str(consecutive_empty)
                 consecutive_empty = 0
@@ -311,7 +312,6 @@ class GamePiece:
 
     def add_self(self, square):
         self.position = square
-        print([neighbor for neighbor in self.get_neighbors()])
         [neighbor.sandwich() for neighbor in self.get_neighbors() if self.position in neighbor.get_sandwichers()]
         self.game.turn["board"][self.position] = self
 
