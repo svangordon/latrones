@@ -2,10 +2,10 @@ class GameState:
 
     fen_strings = {
     #Make sure to change this back!
-        "standard": "o11/12/12/12/12/12/12/12,w,12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f" #seperate pieces w/ comma
+        "standard": "o11/12/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f" #seperate pieces w/ comma
     }
 
-    turn_cols = ('board', 'active_player', 'stone_count', 'half_move_clock', 'full_move_clock')
+    turn_cols = ('board', 'active_player', 'half_move_clock', 'full_move_clock')
     rules_cols = ('board_width', 'board_height', 'stone_count','capture', 'win_condition', 'trapping')
     piece_cols = ('char', "move_pattern", "jump_pattern", "sides_to_capture", "lose_on_capture")
 
