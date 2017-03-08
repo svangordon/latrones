@@ -228,12 +228,27 @@ class GamePiece:
             start = self.position
             end = coord_1
         # row_step is how we'd change coord to go "forward" relative to the piece
-        if self.game.turn["active_player"] == 1:
+        if self.game.turn["active_player"] == 1: # !!! This is a potentially hazardous choice.
+        # I'm using active_player as a stand in for piece.owner, which limiting the flexibility of this fn
+        # and also threatening to bite us in the rear. Wait, maybe this isn't used at all...?
             row_step = -self.game["rules"]["row_len"]
         else:
             row_step = self.game.rules["row_len"]
         #determine which direction we're going in (starting at forward, counting clockwise)
         print(end)
+        # in order: NEWS
+        #           0123
+        if start % self.game.rules["row_len"] == end % self.game.rules["row_len"]:
+            if end < start:
+                return 0
+            else:
+                return 3
+        elif end == start - 1:
+            return 2
+        elif end == start + 1:
+            return 1
+        else:
+            raise ValueError("couldn't set direction")
         if start - row_step <= end:
             return 0
         elif start + row_step >= end:
