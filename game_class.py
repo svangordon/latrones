@@ -220,7 +220,7 @@ class GamePiece:
             self.move_pattern = props["move_pattern"]
             self.jump_pattern = props["jump_pattern"]
 
-    def determine_direction(self, coord1, coord2=None):
+    def determine_direction(self, coord_1, coord_2=None):
         """ return which cardinal direction a move is in """
         if coord2:
             start = coord_1
