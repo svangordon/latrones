@@ -235,7 +235,6 @@ class GamePiece:
         else:
             row_step = self.game.rules["row_len"]
         #determine which direction we're going in (starting at forward, counting clockwise)
-        print(end)
         # in order: NEWS
         #           0123
         if start % self.game.rules["row_len"] == end % self.game.rules["row_len"]:
@@ -329,6 +328,7 @@ class GamePiece:
         board = game.turn["board"]
         origin_square = board[start_coord]
         end_square = board[end_coord]
+        jump_pattern = self.jump_pattern if self.owner == 0 else reverse(self.jump_pattern)
         if end_coord == start_square + 2:
             jumped_coord = start_square + 1
         elif end_coord == start_square - 2:
@@ -352,7 +352,7 @@ class GamePiece:
         if self.trapped and not self.trapped_jump:
             raise ValueError("trapped piece attempting to jump")
 
-        if self.jump_pattern[direction] not in allowed_jump_vals:
+        if jump_pattern[direction] not in allowed_jump_vals:
             raise ValueError("bad jump_pattern value", direction, self.jump_pattern[direction])
 
     def validate_square_entry(self, end_coord):
@@ -368,7 +368,8 @@ class GamePiece:
 
     def validate_non_jump(self, end_coord):
         direction = self.determine_direction(end_coord)
-        if not self.move_pattern[direction]:
+        move_pattern = self.move_pattern if self.owner == 0 else reverse(self.move_pattern)
+        if not move_pattern[direction]:
             raise ValueError("attempting non-jump in invalid direction")
 
         if self.game.turn["active_player"] == 1:
@@ -377,8 +378,8 @@ class GamePiece:
             row_step = self.game.rules["row_len"]
         steps = [row_step, row_step**0, -row_step, -row_step**0] # this order is probably wrong
         step = steps[direction]
-        if end_coord != self.position + step and self.move_pattern[direction] != 2:
-            raise ValueError("piece with move pattern attempting to move more than 1 space: \n", "end_coord", end_coord, 'self.position', self.position, 'step', step, 'self.move_pattern[direction]',self.move_pattern[direction], 'direction',direction)
+        if end_coord != self.position + step and move_pattern[direction] != 2:
+            raise ValueError("piece with move pattern attempting to move more than 1 space: \n", "end_coord", end_coord, 'self.position', self.position, 'step', step, 'move_pattern[direction]',move_pattern[direction], 'direction',direction)
         cnt = 1
         while True:
             self.validate_square_entry(self.position + step*cnt)
