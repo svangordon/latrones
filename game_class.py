@@ -360,7 +360,7 @@ class GamePiece:
         if self.game.turn["active_player"] == 1:
             row_step = -self.game["rules"]["row_len"]
         else:
-            row_step = self.game["rules"]["row_len"]
+            row_step = self.game.rules["row_len"]
         steps = [row_step, row_step**0, -row_step, -row_step**0] # this order is probably wrong
         step = steps[direction]
         if end_coord != self.position + step and self.move_pattern[direction] != 2:
