@@ -6,8 +6,11 @@ class TestRules(unittest.TestCase):
     def setUp(self):
         self.game = GameState("standard", True)
 
-    def test_basic(self):
-        self.game.handle_move(15, 16)
+    def test_determine_direction(self):
+        self.assertEqual(self.game.square(15).determine_direction(16), 3)
+
+    # def test_basic(self):
+        # self.game.handle_move(15, 16)
 
     # def test_deserialize_rules(self):
     #     self.game.deserialize_rules("d,-4,T")

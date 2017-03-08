@@ -31,7 +31,7 @@ class GameState:
     def empty_square(self, square):
         self.turn["board"][square] = self.gen.piece("empty", square)
 
-    def get_square(self, square):
+    def square(self, square):
         return self.turn["board"][square]
 
     def deserialize_rules(self):
@@ -364,7 +364,7 @@ class GamePiece:
         steps = [row_step, row_step**0, -row_step, -row_step**0] # this order is probably wrong
         step = steps[direction]
         if end_coord != self.position + step and self.move_pattern[direction] != 2:
-            raise ValueError("piece with move pattern attempting to move more than 1 space")
+            raise ValueError("piece with move pattern attempting to move more than 1 space: \n", "end_coord", end_coord, 'self.position', self.position, 'step', step, 'self.move_pattern[direction]',self.move_pattern[direction], 'direction',direction)
         cnt = 1
         while True:
             self.validate_square_entry(self.position + step*cnt)
@@ -378,7 +378,7 @@ class GamePiece:
 
     def get_neighbors(self):
         """ Return list of references to neighboring squares, starting at north and going clockwise """
-        return list(map(self.game.get_square, [self.position - self.game.rules["row_len"], self.position + 1, self.position + self.game.rules["row_len"], self.position - 1]))
+        return list(map(self.game.square, [self.position - self.game.rules["row_len"], self.position + 1, self.position + self.game.rules["row_len"], self.position - 1]))
 
     def get_sandwichers(self):
         """ returns tuples enemy pieces sandwiching square """
