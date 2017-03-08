@@ -232,11 +232,12 @@ class GamePiece:
         if self.game.turn["active_player"] == 1:
             row_step = -self.game["rules"]["row_len"]
         else:
-            row_step = self.game["rules"]["row_len"]
+            row_step = self.game.rules["row_len"]
         #determine which direction we're going in (starting at forward, counting clockwise)
-        if start - row_step <= dest:
+        print(end)
+        if start - row_step <= end:
             return 0
-        elif start + row_step >= dest:
+        elif start + row_step >= end:
             return 2
         elif origin_square.position - row_step < end_square.position < origin_square.position:
             return 1 # might be wrong on this?
@@ -306,7 +307,7 @@ class GamePiece:
             for i in range(1, len(squares)):
                 self.validate_jump(squares[i - 1], squares[i])
         else:
-            self.validate_non_jump(squares)
+            self.validate_non_jump(*squares)
         # passed all the tests
         return True
 
