@@ -193,6 +193,8 @@ class PieceGenerator:
                 props["owner"] = 0
             else:
                 props["owner"] = 1
+        else:
+            props["owner"] = None
         return GamePiece(self.game, props, position)
 
 class GamePiece:
