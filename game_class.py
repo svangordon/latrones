@@ -1,10 +1,11 @@
-class GameState:
+self.game["rules"]["row_len"]class GameState:
 
     fen_strings = {
-        "standard": "12/12/12/12/12/12/12/12,12,8,w,12,0,0,1 d,-4,T o/1101/1121/2222/2/f" #seperate pieces w/ comma
+        "standard": "12/12/12/12/12/12/12/12,,w,12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f" #seperate pieces w/ comma
     }
 
-    cols = ('board', 'board_width', 'board_height', 'active_player', 'stone_count', 'half_move_clock', 'full_move_clock')
+    turn_cols = ('board', , 'active_player', 'stone_count', 'half_move_clock', 'full_move_clock')
+    rules_cols = ('board_width', 'board_height', 'stone_count','capture', 'win_condition', 'trapping')
 
     def __init__(self, fen_string, init=False):
         self.turn = {}
@@ -16,7 +17,7 @@ class GameState:
         # board = split_string[0]
         # rules = split_string[1]
         # pieces = split_string[2]
-        self.turn_string = split_string[0]
+        self.game_string = split_string[0]
         self.rules_string = split_string[1]
         self.pieces_string = split_string[2]
         self.deserialize_rules()
@@ -25,11 +26,14 @@ class GameState:
         # self.deserialize_rules(rules)
         # self.deserialize_pieces(pieces)
 
+    def empty_square(self, square):
+        self.turn["board"][square] = self.gen.piece("empty", square)
 
-    # def deserialize_fen_string(self, fen_string):
+    def get_square(self, square):
+        return self.turn["board"][square]
 
     def deserialize_rules(self):
-        rules = self.rule_string.split(',')
+        rules = dict(zip(self.rules_cols, self.rules_string.split(',')))
         capture_methods = {
             "d": "displacement",
             "c": "custodial",
@@ -39,9 +43,14 @@ class GameState:
             "T": True,
             "t": False
         }
-        self.rules["capture_method"] = capture_methods[rules[0]]
-        self.rules["win_condition"] = int(rules[1])
-        self.rules["trapping"] = trapping[rules[2]]
+        rules["board_width"] = int(rules["board_width"])
+        rules["board_height"] = int(rules["board_height"])
+        rules["stone_count"] = int(rules["stone_count"])
+        rules["capture_method"] = capture_methods[rules[0]]
+        rules["win_condition"] = int(rules["win_condition"])
+        rules["trapping"] = trapping[rules["trapping"]]
+        rules["row_len"] = rules["board_width"] + 2
+        self.rules = rules
 
     def serialize_rules(self):
         rules = []
@@ -91,14 +100,14 @@ class GameState:
 
     def deserialize_board_string(self):
         output = []
-        board_string = self.turn.board
+        board_string = self.turn["board"]
         assert isinstance(board_string, str)
         passed_one_flag = False
         coord_counter = 0
         def add_square(square_type):
             output.append(self.gen.piece(square_type), coord_counter)
             coord_counter += 1
-        for i in range(self.turn.row_len):
+        for i in range(self.rules["row_len"]):
             add_square("invalid")
         for row in board_string.split('/'):
             add_square("invalid")
@@ -116,34 +125,34 @@ class GameState:
                     passed_one_flag = False
                     add_square(char)
             add_square("invalid")
-        for i in range(self.turn.row_len):
+        for i in range(self.rules["row_len"]):
             add_square("invalid")
         # And now, overwrite state
         self.game.turn["board"] = output
 
     def serialize_board_string(self):
         output = ''
-        pointer = self.turn.row_len + 1
+        pointer = self.turn["row_len"] + 1
         consecutive_empty = 0
-        for i in self.turn.board_height:
-            for k in self.turn.board_width:
-                if not self.turn.board[pointer]["occupied"]:
+        for i in self.rules["board_height"]:
+            for k in self.rules["board_width"]:
+                if not self.turn["board"][pointer]["occupied"]:
                     consecutive_empty += 1
                 else:
                     if consecutive_empty:
                         output += str(consecutive_empty)
                         consecutive_empty = 0
-                    char = self.turn.board[pointer]["char"]
-                    if self.turn.board[pointer]["owner"] == 0:
-                        output += self.turn.board[pointer]["char"].lower()
+                    char = self.turn["board"][pointer]["char"]
+                    if self.turn["board"][pointer]["owner"] == 0:
+                        output += self.turn["board"][pointer]["char"].lower()
                     else:
-                        output += self.turn.board[pointer]["char"].upper()
+                        output += self.turn["board"][pointer]["char"].upper()
             if consecutive_empty:
                 output += str(consecutive_empty)
                 consecutive_empty = 0
             output += '/'
-            pointer -= self.turn.board_width
-            pointer += self.turn.row_len
+            pointer -= self.rules["board_width"]
+            pointer += self.turn["row_len"]
         self.board_string = output
 
 class PieceGenerator:
@@ -185,13 +194,19 @@ class GamePiece:
         self.jump_pattern = props["jumps"]
         self.trapped_jump_pattern = props["trapped_jump_pattern"]
 
-    def determine_direction(self, start:int, dest:int):
+    def determine_direction(self, coord1, coord2=None):
         """ return which cardinal direction a move is in """
+        if coord2:
+            start = coord_1
+            end = coord_2
+        else:
+            start = self.position
+            end = coord_1
         # row_step is how we'd change coord to go "forward" relative to the piece
         if self.game.turn["active_player"] == 1:
-            row_step = -self.game["turn"]["row_len"]
+            row_step = -self.game["rules"]["row_len"]
         else:
-            row_step = self.game["turn"]["row_len"]
+            row_step = self.game["rules"]["row_len"]
         #determine which direction we're going in (starting at forward, counting clockwise)
         if start - row_step <= dest:
             return 0
@@ -209,18 +224,57 @@ class GamePiece:
         self.remove_piece(squares[0])
         self.add_piece(squares[-1])
 
+    def remove_self(self):
+        """ The piece removes itself, untrapping if necessary.
+        Probably should move this to the game class, but it works here.
+        """
+        if self.game.rules["trapping"]:
+            for trapped_neighbor in [neighbor for neighbor in self.get_neighbors() if neighbor.trapped and self.position in neighbor.get_sandwichers() and len(neighbor.get_sandwichers()) == 2]
+                trapped_neighbor.untrap()
+        self.game.empty_square(self.position)
+        self.position = None
+
+    def add_self(self, square):
+        self.position = square
+        [neighbor.sandwich() for neighbor in self.get_neighbors() if self.position in neighbor.get_sandwichers()]
+        self.game.turn["board"][self.position] = self
+
+    def sandwich(self):
+        """ The piece handles itself being sandwiched """
+        if self.game.rules["capture_method"] == "custodial_capture":
+            self.remove_self()
+        if self.game.rules["trapping"]:
+            for trapped_neighbor in [neighbor for neighbor in self.get_neighbors() if neighbor.trapped and self.position in neighbor.get_sandwichers() and len(neighbor.get_sandwichers()) == 2]
+                trapped_neighbor.untrap()
+        self.trap()
+
+    def untrap(self):
+        self.trapped = False
+
+    def trap(self):
+        [neighbor.untrap() for neighbor in self.neighbors() if  ]
+        # self.trapped = True
+        # self.checked = True
+
+
     def validate_move(self, *squares):
-        board = game.turn["board"]
+        board = self.game.turn["board"]
         origin_square = board[squares[0]]
         end_square = board[squares[-1]]
         if not origin_square["owner"] == self.turn["active_player"]:
             raise ValueError("Moving piece not owned by active_player")
+
+        if self.game.rules["trapping"] and self.trapped and not len(squares) >= 3:
+            raise ValueError("Attmepting to move trapped piece")
 
         for square in squares:
             if not board[square]["valid"] == True:
                 raise ValueError("Invalid square")
 
         if len(squares) > 2:
+            for square in squares [1:-1]:
+                if self.game["board"][square]["occupied"]:
+                    raise ValueError("attempting to jump through occupied square")
             for i in range(1, len(squares)):
                 self.validate_jump(squares[i - 1], squares[i])
         else:
@@ -261,17 +315,50 @@ class GamePiece:
     def validate_square_entry(self, end_coord):
         """ Validate whether the piece can enter a given square, based on what's already there"""
         end_square = self.game.turn["board"]
+        if not end_square.valid:
+            raise ValueError("attempting to enter invalid square")
         if end_square.occupied:
             if not self.rules["capture_method"] == "displacement":
                 raise ValueError("Moving to occupied square, but capture_method != displacement")
             if self.rules["trapping"] and not end_square["trapped"]:
                 raise ValueError("Moving to occupied square, but end_square is not trapped")
-        if self.game.rules["trapping"] and origin_square["trapped"]:
-            raise ValueError("Attmepting to move trapped piece")
 
-        # if self.game.rules["trapping"] and self.trapped:
-        #     if self.
-        #      and self.trapped_jump_pattern[direction] !== 2:
-        #     raise ValueError("jump doesn't fit trapped_jump_pattern")
-        # elif self.jump_pattern[direction] !== 1:
-        #     raise ValueError("jump doesn't fit jump_pattern")
+    def validate_non_jump(self, end_coord):
+        direction = self.determine_direction(end_coord)
+        if not self.move_pattern[direction]:
+            raise ValueError("attempting non-jump in invalid direction")
+
+        if self.game.turn["active_player"] == 1:
+            row_step = -self.game["rules"]["row_len"]
+        else:
+            row_step = self.game["rules"]["row_len"]
+        steps = [row_step, row_step**0, -row_step, -row_step**0] # this order is probably wrong
+        step = steps[direction]
+        if end_coord != self.position + step and self.move_pattern[direction] != 2:
+            raise ValueError("piece with move pattern attempting to move more than 1 space")
+        cnt = 1
+        while True:
+            self.validate_square_entry(self.position + step*cnt)
+            if self.position + step*cnt == end_coord:
+                break
+            elif self.game["board"][self.position + step*cnt].occupied:
+                raise ValueError("attempting to move through occupied square")
+            cnt += 1
+        # we've validated all of the squares, so we're done, i think
+        return True
+
+    def get_neighbors(self):
+        """ Return list of references to neighboring squares, starting at north and going clockwise """
+        return list(map(self.game.get_square, [self.position - self.game.rules["row_len"], self.position + 1, self.position + self.game.rules["row_len"], self.position - 1]))
+
+    def get_sandwichers(self):
+        """ returns tuples enemy pieces sandwiching square """
+        # pairs = [(square - 1, square + 1), (square - game["row_width"], square + game["row_width"])]
+        resultes = []
+        neighbors = self.neighbors()
+        pairs = ((neighbors[0], neighbors[2]), (neighbors[1], neighbors[3]))
+        for pair in pairs:
+            if self.owner != pair[0].owner and pair[0].occupied and pair[1].owner == pair[2].owner \
+            and (not self.game.rules["trapping"] or True not in [pair[0].trapped, pair[1].trapped]):
+                results.append(*pair)
+        return results

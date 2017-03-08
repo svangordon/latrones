@@ -183,7 +183,7 @@ game-wide rules:
 cap: [d|c|dC] for displacement, custodial, delayed custodial
 win: [int|-int|char] # a player loses when they have int or fewer pieces remaining. 0 if it's win by capturing k
 trap: T|t for whether using trap (yes, no)
-phalanx: P|p for whether using phalanx(yes, no)
+phalanx: P|p for whether using phalanx(yes, no) NB: NO PHALANX FOR NOW
 ex:
 d-4Tp for displacement capture, win on capture 4 enemy stones, using Trapping, no phalanx
 
