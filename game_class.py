@@ -1,3 +1,5 @@
+from string import ascii_lowercase
+
 class GameState:
 
     fen_strings = {
@@ -75,8 +77,8 @@ class GameState:
         self.gen = PieceGenerator(self)
         for piece_string in self.pieces_string.split(','):
             piece_dict = dict(zip(self.piece_cols, piece_string.split('/')))
-            piece_dict["move_pattern"] = [int(num) for num in piece_dict["move_pattern"].split()]
-            piece_dict["jump_pattern"] = [int(num) for num in piece_dict["jump_pattern"].split()]
+            piece_dict["move_pattern"] = [int(num) for num in piece_dict["move_pattern"]]
+            piece_dict["jump_pattern"] = [int(num) for num in piece_dict["jump_pattern"]]
             piece_dict["lose_on_capture"] = piece_dict["lose_on_capture"].isupper()
             self.gen.add_piece(piece_dict)
             # pieces_dict[piece_string[0]] = PieceGenerator(self, piece_string)
@@ -166,8 +168,19 @@ class GameState:
             pointer += self.turn["row_len"]
         self.board_string = output
 
-    def handle_move(self, move_start, move_end):
+    def handle_move(self, move_string):
         """ a shitty version of what the eventual move handler will be """
+        def map_move(move):
+            col = int(ascii_lowercase.find(move[0])) + 1 # dummy col
+            row = int(move[1:])
+            # if not 0 < col <= game["board_width"]:
+                # raise ValueError('bad coord; invalid col in ' + coord)
+            # if not 0 < row <= game["board_height"]:
+                # raise ValueError('bad coord; invalid row in ' + coord)
+            return row*(self.rules["row_len"]) + col
+        move = list(map(map_move,move_string.split(' ')))
+        self.turn["board"][move[0]].make_move(*move[1:])
+
         self.turn["board"][move_start].make_move(move_end)
 
 class PieceGenerator:
@@ -369,7 +382,8 @@ class GamePiece:
     def validate_non_jump(self, end_coord):
         direction = self.determine_direction(end_coord)
         move_pattern = self.move_pattern if self.owner == 0 else reverse(self.move_pattern)
-        if not move_pattern[direction]:
+        print('===', 'move_pattern', move_pattern, len(move_pattern))
+        if not move_pattern[int(direction)]:
             raise ValueError("attempting non-jump in invalid direction")
 
         if self.game.turn["active_player"] == 1:
