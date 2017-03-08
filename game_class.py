@@ -222,7 +222,7 @@ class GamePiece:
 
     def determine_direction(self, coord_1, coord_2=None):
         """ return which cardinal direction a move is in """
-        if coord2:
+        if coord_2:
             start = coord_1
             end = coord_2
         else:
