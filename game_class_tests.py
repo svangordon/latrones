@@ -24,6 +24,7 @@ class TestDeserializeBoard(unittest.TestCase):
         self.test_fens = [
             "c/c/c/c/c/c/c/c,0,0,0 12,8,12,d,-4,T o/1101/1121/2/f",
             "c/ob/3O8/c/bo/c/bO/c,0,0,0 12,8,12,d,-4,T o/1101/1121/2/f"
+            "c/ob/2o*Oo7/bO/b*o/bO/bO/c,0,0,0 12,8,12,d,-4,T o/1101/1121/2/f"
             ]
 
     def test_empty_board(self):
@@ -33,6 +34,11 @@ class TestDeserializeBoard(unittest.TestCase):
         self.assertEqual(GameState("standard", True).fen_string, test_fen)
 
     def test_populated_board(self):
+        test_fen = self.test_fens[0]
+        game = GameState(test_fen)
+        self.assertEqual(game.fen_string, test_fen)
+
+    def test_trap_board(self):
         test_fen = self.test_fens[0]
         game = GameState(test_fen)
         self.assertEqual(game.fen_string, test_fen)
