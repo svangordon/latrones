@@ -38,7 +38,7 @@ class GameState:
 
     @property
     def fen_string(self):
-        self.serialize_turn_string()
+        # self.serialize_turn_string()
         # self.fen_string = ' '.join([self.turn_string, self.rules_string, self.pieces_string])
         return ' '.join([self.turn_string, self.rules_string, self.pieces_string])
 
@@ -159,7 +159,7 @@ class GameState:
     @property
     def turn_string(self):
         # self.serialize_board_string()
-        self.turn_string = ','.join(list(map(str, [self.board_string, self.turn["active_player"], self.turn["half_move_clock"], self.turn["full_move_clock"]])))
+        return ','.join(list(map(str, [self.board_string, self.turn["active_player"], self.turn["half_move_clock"], self.turn["full_move_clock"]])))
 
     @property
     def board_string(self):

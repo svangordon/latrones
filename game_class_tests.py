@@ -26,8 +26,9 @@ class TestDeserializeBoard(unittest.TestCase):
             ]
 
     def test_empty_board(self):
-        game = GameState(test_fen)
         test_fen = self.test_fens[0]
+        game = GameState(test_fen)
+        self.assertEqual(game.fen_string, test_fen)
 
 # class TestDetermineDirection(unittest.TestCase):
 #
