@@ -22,9 +22,9 @@ class TestConvertChar(unittest.TestCase):
 class TestDeserializeBoard(unittest.TestCase):
     def setUp(self):
         self.test_fens = [
-            "c/c/c/c/c/c/c/c,0,0,0 12,8,12,d,-4,T o/1101/1121/2/f",
-            "c/ob/3O8/c/bo/c/bO/c,0,0,0 12,8,12,d,-4,T o/1101/1121/2/f"
-            "c/ob/2o*Oo7/bO/b*o/bO/bO/c,0,0,0 12,8,12,d,-4,T o/1101/1121/2/f"
+            "c/c/c/c/c/c/c/c,0,0,0 12,8,12,d,-4,T o/1110/1121/2/f",
+            "c/ob/3O8/c/bo/c/bO/c,0,0,0 12,8,12,d,-4,T o/1110/1121/2/f"
+            "c/ob/2o*Oo7/bO/b*o/bO/bO/c,0,0,0 12,8,12,d,-4,T o/1110/1121/2/f"
             ]
 
     def test_empty_board(self):
@@ -73,25 +73,29 @@ class TestDetermineDirection(unittest.TestCase):
 class TestHandleMove(unittest.TestCase):
     def setUp(self):
         self.test_fens = {"simple_move": {
-            "start": "c/1oa/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
-            "end":   "c/2o9/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
+            "start": "c/1oa/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
+            "end":   "c/2o9/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
             "move": "b2 c2"
         }, "simple_jump": {
-            "start": "c/1oa/1oa/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
-            "end":   "c/c/1oa/1oa/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
+            "start": "c/1oa/1oa/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
+            "end":   "c/c/1oa/1oa/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
             "move": "b2 b4"
         }, "invalid_move": {
-            "start": "c/1oa/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
+            "start": "c/1oa/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
             "end": None,
             "move": "b2 e8"
         }, "simple_displacement_capture": {
-            "start": "c/1o*Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
-            "end":   "c/2oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
+            "start": "c/1o*Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
+            "end":   "c/2oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
             "move": "b2 c2"
         }, "simple_trap": {
-            "start": "c/o1Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
-            "end":   "c/1o*Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
+            "start": "c/o1Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
+            "end":   "c/1o*Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
             "move": "a2 b2"
+        }, "simple_untrap": {
+            "start":    "c/1o*Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
+            "end":      "c/o1Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
+            "move":     "b2 a2"
         }}
 
     def test_simple_move(self):
@@ -122,12 +126,18 @@ class TestHandleMove(unittest.TestCase):
         test_fens = self.test_fens["simple_trap"]
         game = GameState(test_fens["start"])
         game.handle_move(test_fens["move"])
-        # pprint(vars(game.square(31)))
+        self.assertEqual(test_fens["end"], game.fen_string)
+
+    def test_simple_untrap(self):
+        test_fens = self.test_fens["simple_untrap"]
+        game = GameState(test_fens["start"])
+        print(test_fens["move"])
+        game.handle_move(test_fens["move"])
         self.assertEqual(test_fens["end"], game.fen_string)
 
 class TestSandwichers(unittest.TestCase):
     def test_simple_sandwich(self):
-        fen = "c/1o*Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f"
+        fen = "c/1o*Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f"
         expected = [32, 30]
         game = GameState(fen)
         self.assertEqual([square.position for square in game.square(31).get_sandwichers()], expected)

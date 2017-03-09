@@ -3,7 +3,7 @@ from string import ascii_lowercase
 class GameState:
 
     fen_strings = {
-        "standard": "c/c/c/c/c/c/c/c,0,0,0 12,8,12,d,-4,T o/1101/1121/2/f" #seperate pieces w/ comma
+        "standard": "c/c/c/c/c/c/c/c,0,0,0 12,8,12,d,-4,T o/1110/1121/2/f" #seperate pieces w/ comma
     }
     turn_cols = ('board', 'active_player', 'half_move_clock', 'full_move_clock')
     rules_cols = ('board_width', 'board_height', 'stone_count','capture', 'win_condition', 'trapping')
@@ -412,6 +412,7 @@ class GamePiece:
     def validate_non_jump(self, end_coord):
         direction = self.determine_direction(end_coord)
         move_pattern = self.move_pattern if self.owner == 0 else reverse(self.move_pattern)
+        print('===', direction, '===', move_pattern)
         if not move_pattern[int(direction)]:
             raise ValueError("attempting non-jump in invalid direction")
 
