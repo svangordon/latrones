@@ -118,8 +118,6 @@ class GameState:
         trapped_flag = False
         def add_square(square_type):
             nonlocal pointer, trapped_flag
-            # if pointer == 30:
-            #     raise ValueError('======', square_type, pointer, trapped_flag, '=====')
             self.gen.piece(square_type, pointer, trapped_flag)
             trapped_flag = False
             pointer += 1
@@ -134,7 +132,7 @@ class GameState:
                         continue
                     squares_to_add = int(char)
                     if passed_one_flag:
-                        squares_to_add += 10
+                        squares_to_add += 9
                         passed_one_flag = False
                     elif int(char) == 1:
                         passed_one_flag = True
@@ -142,8 +140,6 @@ class GameState:
                         add_square("empty")
                 except ValueError:
                     passed_one_flag = False
-                    # if pointer == 30:
-                        # raise ValueError('======', char, '=====')
                     add_square(char)
             add_square("invalid")
         for i in range(self.rules["row_len"]):
@@ -157,7 +153,7 @@ class GameState:
 
     def serialize_board_string(self):
         output = ''
-        pointer = self.rules["row_len"] + 2
+        pointer = self.rules["row_len"] + 1
         consecutive_empty = 0
         for _ in range(self.rules["board_height"]):
             for __ in range(self.rules["board_width"]):
@@ -443,3 +439,9 @@ class GamePiece:
             and (not self.game.rules["trapping"] or True not in [pair[0].trapped, pair[1].trapped]):
                 results.append(*pair)
         return results
+
+game = GameState("12/1o10/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f")
+# print(type(game.turn["board"]))
+# for i in range(len(game.turn["board"])):
+    # square = game.turn["board"][i]
+    # print(i, square.valid, square.occupied, square.owner, square.char)

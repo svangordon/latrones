@@ -39,7 +39,7 @@ class TestHandleMove(unittest.TestCase):
         # self.game.handle_move("b2 c2")
         # "12/1o10/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f"
         self.game.serialize_fen_string()
-        # raise ValueError(self.game.turn["board"])
+        # raise ValueError(self.game.square())
         self.assertEqual("12/1o10/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f", self.game.fen_string)
         # self.assertEqual("12/2o9/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f", self.game.fen_string)
         # self.assertTrue(self.game.serialize_fen_string())
