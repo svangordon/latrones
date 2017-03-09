@@ -19,12 +19,12 @@ class GameState:
         # board = split_string[0]
         # rules = split_string[1]
         # pieces = split_string[2]
-        self.turn_string = split_string[0]
+        # self.turn_string = split_string[0]
         self.rules_string = split_string[1]
         self.pieces_string = split_string[2]
         self.deserialize_rules()
         self.deserialize_pieces()
-        self.deserialize_turn()
+        self.deserialize_turn(split_string[0])
         # self.deserialize_rules(rules)
         # self.deserialize_pieces(pieces)
 
@@ -103,7 +103,7 @@ class GameState:
             output.append(self.pieces_dict[piece].piece_string)
         return ','.join(output)
 
-    def deserialize_turn(self):
+    def deserialize_turn(self, turn_string):
         # ('board', 'board_width', 'board_height', 'active_player', 'stone_count', 'half_move_clock', 'full_move_clock')
         # fen_chunks = board_string.split(',')
         def fen_map(chunk):
@@ -114,8 +114,8 @@ class GameState:
 
         # def deserialize_board_string(board_string)
 
-        self.turn = dict(zip(self.turn_cols, map(fen_map, self.turn_string.split(','))))
-        self.board_string = self.turn["board"]
+        self.turn = dict(zip(self.turn_cols, map(fen_map, turn_string.split(','))))
+        # self.board_string = self.turn["board"]
         self.deserialize_board_string()
 
     def deserialize_board_string(self):
@@ -156,11 +156,13 @@ class GameState:
         # # And now, overwrite state
         # self.game.turn["board"] = output
 
-    def serialize_turn_string(self):
-        self.serialize_board_string()
+    @property
+    def turn_string(self):
+        # self.serialize_board_string()
         self.turn_string = ','.join(list(map(str, [self.board_string, self.turn["active_player"], self.turn["half_move_clock"], self.turn["full_move_clock"]])))
 
-    def serialize_board_string(self):
+    @property
+    def board_string(self):
         output = ''
         pointer = self.rules["row_len"] + 1
         consecutive_empty = 0
@@ -185,7 +187,7 @@ class GameState:
                 output += '/'
             pointer -= self.rules["board_width"]
             pointer += self.rules["row_len"]
-        self.board_string = output
+        return output
 
     def handle_move(self, move_string):
         """ an okay version of what the eventual move handler will be """
