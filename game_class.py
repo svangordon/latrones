@@ -151,7 +151,7 @@ class GameState:
                     # passed_one_flag = False
                     add_square(char)
             add_square("invalid")
-        for i in range(self.rules["row_len"]):
+        for i in range(self.rules["row_len"]+1):
             add_square("invalid")
         # # And now, overwrite state
         # self.game.turn["board"] = output
