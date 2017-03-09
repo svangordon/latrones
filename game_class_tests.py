@@ -122,7 +122,16 @@ class TestHandleMove(unittest.TestCase):
         test_fens = self.test_fens["simple_trap"]
         game = GameState(test_fens["start"])
         game.handle_move(test_fens["move"])
+        # pprint(vars(game.square(31)))
         self.assertEqual(test_fens["end"], game.fen_string)
+
+class TestSandwichers(unittest.TestCase):
+    def test_simple_sandwich(self):
+        fen = "c/1o*Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f"
+        expected = [32, 30]
+        game = GameState(fen)
+        self.assertEqual([square.position for square in game.square(31).get_sandwichers()], expected)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -288,17 +288,6 @@ class GamePiece:
         else:
             start = self.position
             end = coord_1
-        # row_step is how we'd change coord to go "forward" relative to the piece
-        # if self.game.turn["active_player"] == 1: # !!! This is a potentially hazardous choice.
-        # # I'm using active_player as a stand in for piece.owner, which limiting the flexibility of this fn
-        # # and also threatening to bite us in the rear. Wait, maybe this isn't used at all...?
-        #     row_step = -self.game["rules"]["row_len"]
-        # else:
-        #     row_step = self.game.rules["row_len"]
-        #determine which direction we're going in (starting at forward, counting clockwise)
-        # in order: NEWS
-        #           0123
-        # Because we had the very clever idea to reverse move patterns, this isn't needed
 
         if start % self.game.rules["row_len"] == end % self.game.rules["row_len"]:
             if end < start:
@@ -311,16 +300,6 @@ class GamePiece:
             return 1
         else:
             raise ValueError("couldn't set direction", start, end)
-        # if start - row_step <= end:
-        #     return 0
-        # elif start + row_step >= end:
-        #     return 2
-        # elif origin_square.position - row_step < end_square.position < origin_square.position:
-        #     return 1 # might be wrong on this?
-        # elif origin_square.position + row_step > end_square.position > origin_square.position:
-        #     return 3
-        # else:
-        #     raise ValueError("tried to find direction and failed")
 
     def make_move(self, *squares):
         self.validate_move(*squares)
@@ -340,11 +319,12 @@ class GamePiece:
 
     def add_self(self, square):
         self.position = square
-        [neighbor.sandwich() for neighbor in self.get_neighbors() if self.position in neighbor.get_sandwichers()]
         self.game.turn["board"][self.position] = self
+        [neighbor.sandwich() for neighbor in self.get_neighbors() if self.position in neighbor.get_sandwichers()]
 
     def sandwich(self):
         """ The piece handles itself being sandwiched """
+        print("===", self.position, "is sandwiched", '===')
         if self.game.rules["capture"] == "custodial_capture":
             self.remove_self()
         if self.game.rules["trapping"]:
@@ -471,7 +451,7 @@ class GamePiece:
         for pair in pairs:
             if self.owner != pair[0].owner and pair[0].occupied and pair[0].owner == pair[1].owner \
             and (not self.game.rules["trapping"] or True not in [pair[0].trapped, pair[1].trapped]):
-                results.append([*pair])
+                results.extend([*pair])
         return results
 
 game = GameState("12/1o10/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f")
