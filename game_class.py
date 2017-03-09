@@ -137,7 +137,7 @@ class GameState:
             for char in row:
                 try:
                     if char == '*':
-                        checked_flag = True
+                        trapped_flag = True
                         continue
                     squares_to_add = self.convert_char(char)
                     # if passed_one_flag:
@@ -174,6 +174,8 @@ class GameState:
                     if consecutive_empty:
                         output += self.convert_char(consecutive_empty)
                         consecutive_empty = 0
+                    if self.turn["board"][pointer].trapped:
+                        output += '*'
                     char = self.turn["board"][pointer].char
                     if self.turn["board"][pointer].owner == 0:
                         output += self.turn["board"][pointer].char.lower()
