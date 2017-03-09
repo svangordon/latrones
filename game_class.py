@@ -7,7 +7,7 @@ class GameState:
     }
     turn_cols = ('board', 'active_player', 'half_move_clock', 'full_move_clock')
     rules_cols = ('board_width', 'board_height', 'stone_count','capture', 'win_condition', 'trapping')
-    piece_cols = ('char', "move_pattern", "jump_pattern", "sides_to_capture", "lose_on_capture")
+    piece_cols = ('type', "move_pattern", "jump_pattern", "sides_to_capture", "lose_on_capture")
 
     def __init__(self, fen_string, init=False):
         self.turn = {}
@@ -97,11 +97,11 @@ class GameState:
             # pieces_dict[piece_string[0]] = PieceGenerator(self, piece_string)
         # self.pieces_dict = pieces_dict
 
-    def serialize_pieces(self):
-        output = []
-        for piece in self.pieces_dict:
-            output.append(self.pieces_dict[piece].piece_string)
-        return ','.join(output)
+    # def serialize_pieces(self):
+    #     output = []
+    #     for piece in self.pieces_dict:
+    #         output.append(self.pieces_dict[piece].piece_string)
+    #     return ','.join(output)
 
     def deserialize_turn(self, turn_string):
         # ('board', 'board_width', 'board_height', 'active_player', 'stone_count', 'half_move_clock', 'full_move_clock')
@@ -212,10 +212,12 @@ class PieceGenerator:
         self.game = game
         self.pieces = {
             "invalid": {
+                "type": "invalid",
                 "valid": False,
                 "occupied": False
             },
             "empty": {
+                "type": "empty",
                 "valid": True,
                 "occupied": False
             }
@@ -254,15 +256,28 @@ class GamePiece:
         if self.occupied:
             self.owner = props["owner"]
             self.trapped = props["trapped"]
-            self.char = props["char"]
+            self.type = props["type"]
             self.move_pattern = props["move_pattern"]
             self.jump_pattern = props["jump_pattern"]
         else:
             self.owner = None
             self.trapped = None
-            self.char = None
+            self.type = None
             self.move_pattern = None
             self.jump_pattern = None
+
+    @property
+    def char(self):
+        output = ''
+        if self.type in ["empty", "invalid"]:
+            return self.type
+        if self.trapped:
+            ouput += '*'
+        if self.owner == 1:
+            output += self.type.upper()
+        else:
+            output += self.type.lower()
+        return output
 
     def determine_direction(self, coord_1, coord_2=None):
         """ return which cardinal direction a move is in """

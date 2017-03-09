@@ -88,6 +88,10 @@ class TestHandleMove(unittest.TestCase):
             "start": "c/1o*Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
             "end":   "c/2oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
             "move": "b2 c2"
+        }, "simple_trap": {
+            "start": "c/o1Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
+            "end":   "c/1o*Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
+            "move": "a2 b2"
         }}
 
     def test_simple_move(self):
@@ -110,6 +114,12 @@ class TestHandleMove(unittest.TestCase):
 
     def test_simple_displacement_capture(self):
         test_fens = self.test_fens["simple_displacement_capture"]
+        game = GameState(test_fens["start"])
+        game.handle_move(test_fens["move"])
+        self.assertEqual(test_fens["end"], game.fen_string)
+
+    def test_simple_trap(self):
+        test_fens = self.test_fens["simple_trap"]
         game = GameState(test_fens["start"])
         game.handle_move(test_fens["move"])
         self.assertEqual(test_fens["end"], game.fen_string)
