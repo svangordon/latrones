@@ -320,7 +320,8 @@ class GamePiece:
     def add_self(self, square):
         self.position = square
         self.game.turn["board"][self.position] = self
-        [neighbor.sandwich() for neighbor in self.get_neighbors() if self.position in neighbor.get_sandwichers()]
+        print([neighbor for neighbor in self.get_neighbors() if self in neighbor.get_sandwichers()])
+        [neighbor.sandwich() for neighbor in self.get_neighbors() if self in neighbor.get_sandwichers()]
 
     def sandwich(self):
         """ The piece handles itself being sandwiched """
