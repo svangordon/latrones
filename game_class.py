@@ -261,15 +261,17 @@ class GamePiece:
             start = self.position
             end = coord_1
         # row_step is how we'd change coord to go "forward" relative to the piece
-        if self.game.turn["active_player"] == 1: # !!! This is a potentially hazardous choice.
-        # I'm using active_player as a stand in for piece.owner, which limiting the flexibility of this fn
-        # and also threatening to bite us in the rear. Wait, maybe this isn't used at all...?
-            row_step = -self.game["rules"]["row_len"]
-        else:
-            row_step = self.game.rules["row_len"]
+        # if self.game.turn["active_player"] == 1: # !!! This is a potentially hazardous choice.
+        # # I'm using active_player as a stand in for piece.owner, which limiting the flexibility of this fn
+        # # and also threatening to bite us in the rear. Wait, maybe this isn't used at all...?
+        #     row_step = -self.game["rules"]["row_len"]
+        # else:
+        #     row_step = self.game.rules["row_len"]
         #determine which direction we're going in (starting at forward, counting clockwise)
         # in order: NEWS
         #           0123
+        # Because we had the very clever idea to reverse move patterns, this isn't needed
+
         if start % self.game.rules["row_len"] == end % self.game.rules["row_len"]:
             if end < start:
                 return 0
@@ -280,7 +282,7 @@ class GamePiece:
         elif end == start + 1:
             return 1
         else:
-            raise ValueError("couldn't set direction")
+            raise ValueError("couldn't set direction", start, end)
         # if start - row_step <= end:
         #     return 0
         # elif start + row_step >= end:
@@ -344,16 +346,18 @@ class GamePiece:
         for square in squares:
             if not board[square].valid == True:
                 raise ValueError("Invalid square")
-
-        if len(squares) >= 2:
+        # We're just going to try and validate the move, and if it breaks, we validate it as a jump
+        try:
+            self.validate_non_jump(*squares)
+        except ValueError:
             for square in squares [:-1]:
                 if self.game["board"][square]["occupied"]:
                     raise ValueError("attempting to jump through occupied square")
-            self.validate_jump(self.position, squares[0])
-            for i in range(1, len(squares)):
-                self.validate_jump(squares[i - 1], squares[i])
-        else:
-            self.validate_non_jump(*squares)
+                    self.validate_jump(self.position, squares[0])
+                    for i in range(1, len(squares)):
+                        self.validate_jump(squares[i - 1], squares[i])
+        # if len(squares) >= 2:
+        # else:
         # passed all the tests
         return True
 
