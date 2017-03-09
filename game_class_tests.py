@@ -72,34 +72,34 @@ class TestDetermineDirection(unittest.TestCase):
 
 class TestHandleMove(unittest.TestCase):
     def setUp(self):
-        self.test_fens = [{
+        self.test_fens = {"simple_move": {
             "start": "c/1oac/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
             "end":   "c/2o9/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
             "move": "b2 c2"
-        }, {
+        }, "simple_jump": {
             "start": "c/1oa/1oa/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
             "end":   "c/c/1oa/1oa/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
             "move": "b2 b4"
-        }, {
+        }, "invalid_move": {
             "start": "c/1oa/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
             "end": None,
             "move": "b2 e8"
-        }]
+        }}
 
     def test_simple_move(self):
-        test_fens = self.test_fens[0]
+        test_fens = self.test_fens["simple_move"]
         game = GameState(test_fens["start"])
         game.handle_move(test_fens["move"])
         self.assertEqual(test_fens["end"], game.fen_string)
 
     def test_simple_jump(self):
-        test_fens = self.test_fens[1]
+        test_fens = self.test_fens["simple_jump"]
         game = GameState(test_fens["start"])
         game.handle_move(test_fens["move"])
         self.assertEqual(test_fens["end"], game.fen_string)
 
     def test_invalid_move(self):
-        test_fens = self.test_fens[2]
+        test_fens = self.test_fens["invalid_move"]
         game = GameState(test_fens["start"])
         with self.assertRaises(ValueError):
             game.handle_move(test_fens["move"])
