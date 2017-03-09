@@ -32,17 +32,10 @@ class TestHandleMove(unittest.TestCase):
         self.game = GameState("12/1o10/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f")
         # self.game.gen.piece('o', 30)
 
-    def test_fen(self):
-        # for square in range(len(self.game.turn["board"])):
-            # print(self.game.turn["board"][square].position, self.game.turn["board"][square].char)
-        # raise ValueError(vars(self.game.square(30)))
-        # self.game.handle_move("b2 c2")
-        # "12/1o10/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f"
+    def test_simple_move(self):
+        self.game.handle_move("b2 c2")
         self.game.serialize_fen_string()
-        # raise ValueError(self.game.square())
-        self.assertEqual("12/1o10/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f", self.game.fen_string)
-        # self.assertEqual("12/2o9/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f", self.game.fen_string)
-        # self.assertTrue(self.game.serialize_fen_string())
+        self.assertEqual("12/2o9/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f", self.game.fen_string)
 
 if __name__ == '__main__':
     unittest.main()
