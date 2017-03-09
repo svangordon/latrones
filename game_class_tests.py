@@ -73,12 +73,12 @@ class TestDetermineDirection(unittest.TestCase):
 class TestHandleMove(unittest.TestCase):
     def setUp(self):
         self.test_fens = [{
-            "start": "c/1oac/c/c/c/c/1c0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
-            "end": "c/2o9/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
+            "start": "c/1oac/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
+            "end":   "c/2o9/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
             "move": "b2 c2"
         }, {
             "start": "c/1oa/1oa/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
-            "end": "c/c/1oa/1oa/1c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
+            "end":   "c/c/1oa/1oa/1c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
             "move": "b2 b4"
         }, {
             "start": "c/1oa/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
@@ -89,10 +89,8 @@ class TestHandleMove(unittest.TestCase):
     def test_simple_move(self):
         test_fens = self.test_fens[0]
         game = GameState(test_fens["start"])
-        for position, square in game.turn["board"].items():
-            print(square.position, square.char)
-        # game.handle_move(test_fens["move"])
-        # self.assertEqual(test_fens["end"], game.fen_string)
+        game.handle_move(test_fens["move"])
+        self.assertEqual(test_fens["end"], game.fen_string)
 
     # def test_simple_jump(self):
     #     test_fens = self.test_fens[1]

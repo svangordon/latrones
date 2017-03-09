@@ -172,7 +172,7 @@ class GameState:
                     consecutive_empty += 1
                 else:
                     if consecutive_empty:
-                        output += self.convert_char(consecutive_empty)
+                        output += str(self.convert_char(consecutive_empty))
                         consecutive_empty = 0
                     if self.turn["board"][pointer].trapped:
                         output += '*'
@@ -183,7 +183,7 @@ class GameState:
                         output += self.turn["board"][pointer].char.upper()
                 pointer += 1
             if consecutive_empty:
-                output += self.convert_char(consecutive_empty)
+                output += str(self.convert_char(consecutive_empty))
                 consecutive_empty = 0
             if pointer / self.rules["row_len"] <= self.rules["board_height"]:
                 output += '/'
