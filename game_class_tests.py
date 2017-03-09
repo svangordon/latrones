@@ -2,6 +2,18 @@ import unittest
 from game_class import GameState
 from pprint import pprint
 
+class TestConvertChar(unittest.TestCase):
+    def setUp(self):
+        self.game = GameState("standard", True)
+        self.vals = [(1, 1), (2,2), (3,3), (4,4), (5,5), (6,6), (7,7), (8,8), (9,9), ('a', 10), ('b', 11), ('c', 12), ('d', 13), ('e', 14), ('f', 15)]
+
+    def test_hex_to_dec(self):
+        for val in self.vals:
+            self.assertEqual(self.game.convert_char(val[0]), val[1])
+    def test_dec_to_hex(self):
+        for val in self.vals:
+            self.assertEqual(self.game.convert_char(val[1]), val[0])
+            
 class TestDetermineDirection(unittest.TestCase):
 
     def setUp(self):
@@ -40,6 +52,10 @@ class TestHandleMove(unittest.TestCase):
             "start": "12/1o10/1o10/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
             "end": "12/12/1o10/1o10/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
             "move": "b2 b4"
+        }, {
+            "start": "12/1o10/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
+            "end": None,
+            "move": "b2 e8"
         }]
 
     def test_simple_move(self):
@@ -47,8 +63,6 @@ class TestHandleMove(unittest.TestCase):
         game = GameState(test_fens["start"])
         game.handle_move(test_fens["move"])
         game.serialize_fen_string()
-        # for property, value in vars(game).items():
-            # print(property, ": ", value)
         self.assertEqual(test_fens["end"], game.fen_string)
 
     def test_simple_jump(self):
@@ -56,9 +70,13 @@ class TestHandleMove(unittest.TestCase):
         game = GameState(test_fens["start"])
         game.handle_move(test_fens["move"])
         game.serialize_fen_string()
-        # for property, value in vars(game).items():
-            # print(property, ": ", value)
         self.assertEqual(test_fens["end"], game.fen_string)
+
+    # def test_invalid_move(self):
+    #     test_fens = self.test_fens[1]
+    #     game = GameState(test_fens["start"])
+    #     # with self.assertRaises(ValueError):
+    #     game.handle_move(test_fens["move"])
 
     # def test_all(self):
     #     for test in self.test_fens:

@@ -5,7 +5,6 @@ class GameState:
     fen_strings = {
         "standard": "12/12/12/12/12/12/12/12,0,0,0 12,8,12,d,-4,T o/1101/1121/2/f" #seperate pieces w/ comma
     }
-
     turn_cols = ('board', 'active_player', 'half_move_clock', 'full_move_clock')
     rules_cols = ('board_width', 'board_height', 'stone_count','capture', 'win_condition', 'trapping')
     piece_cols = ('char', "move_pattern", "jump_pattern", "sides_to_capture", "lose_on_capture")
@@ -28,6 +27,14 @@ class GameState:
         self.deserialize_turn()
         # self.deserialize_rules(rules)
         # self.deserialize_pieces(pieces)
+
+    @staticmethod
+    def convert_char(char):
+        chars = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c' ,'d' ,'e', 'f']
+        try:
+            return chars[int(char)]
+        except ValueError:
+            return chars.index(char)
 
     def serialize_fen_string(self):
         self.serialize_turn_string()
