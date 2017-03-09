@@ -121,7 +121,7 @@ class GameState:
         # output = []
         board_string = self.turn["board"]
         self.turn["board"] = {}
-        passed_one_flag = False
+        # passed_one_flag = False
         pointer = 0
         trapped_flag = False
         def add_square(square_type):
@@ -138,16 +138,16 @@ class GameState:
                     if char == '*':
                         checked_flag = True
                         continue
-                    squares_to_add = int(char)
-                    if passed_one_flag:
-                        squares_to_add += 9
-                        passed_one_flag = False
-                    elif int(char) == 1:
-                        passed_one_flag = True
+                    squares_to_add = self.convert_char(char)
+                    # if passed_one_flag:
+                    #     squares_to_add += 9
+                    #     passed_one_flag = False
+                    # elif int(char) == 1:
+                    #     passed_one_flag = True
                     for i in range(squares_to_add):
                         add_square("empty")
                 except ValueError:
-                    passed_one_flag = False
+                    # passed_one_flag = False
                     add_square(char)
             add_square("invalid")
         for i in range(self.rules["row_len"]):
