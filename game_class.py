@@ -411,9 +411,9 @@ class GamePiece:
         if not end_square.valid:
             raise ValueError("attempting to enter invalid square")
         if end_square.occupied:
-            if not self.rules["capture"] == "displacement":
+            if not self.game.rules["capture"] == "displacement":
                 raise ValueError("Moving to occupied square, but capture != displacement")
-            if self.rules["trapping"] and not end_square["trapped"]:
+            if self.game.rules["trapping"] and not end_square.trapped:
                 raise ValueError("Moving to occupied square, but end_square is not trapped")
 
     def validate_non_jump(self, end_coord):
@@ -453,9 +453,9 @@ class GamePiece:
         neighbors = self.get_neighbors()
         pairs = ((neighbors[0], neighbors[2]), (neighbors[1], neighbors[3]))
         for pair in pairs:
-            if self.owner != pair[0].owner and pair[0].occupied and pair[1].owner == pair[2].owner \
+            if self.owner != pair[0].owner and pair[0].occupied and pair[0].owner == pair[1].owner \
             and (not self.game.rules["trapping"] or True not in [pair[0].trapped, pair[1].trapped]):
-                results.append(*pair)
+                results.append([*pair])
         return results
 
 game = GameState("12/1o10/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f")
