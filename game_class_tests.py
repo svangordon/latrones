@@ -30,12 +30,31 @@ class TestDetermineDirection(unittest.TestCase):
 class TestHandleMove(unittest.TestCase):
     def setUp(self):
         self.game = GameState("12/1o10/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f")
-        # self.game.gen.piece('o', 30)
+        self.test_fens = [{
+            "start": "12/1o10/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
+            "end": "12/2o9/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
+            "move": "b2 c2"
+        }, {
+            "start": "12/1o10/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
+            "end": "12/2o9/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
+            "move": "b2 e2"
+        }]
 
     def test_simple_move(self):
-        self.game.handle_move("b2 c2")
-        self.game.serialize_fen_string()
-        self.assertEqual("12/2o9/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f", self.game.fen_string)
+        test_fens = self.test_fens[0]
+        game = GameState(test_fens["start"])
+        game.handle_move(test_fens["move"])
+        game.serialize_fen_string()
+        # for property, value in vars(game).items():
+            # print(property, ": ", value)
+        self.assertEqual("12/2o9/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f", game.fen_string)
+
+    def test_all(self):
+        for test in self.test_fens:
+            game = GameState(test["start"])
+            game.handle_move(test["move"])
+            game.serialize_fen_string()
+            self.assertEqual(game.fen_string, test["end"])
 
 if __name__ == '__main__':
     unittest.main()

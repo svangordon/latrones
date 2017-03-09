@@ -32,6 +32,7 @@ class GameState:
     def serialize_fen_string(self):
         self.serialize_turn_string()
         self.fen_string = ' '.join([self.turn_string, self.rules_string, self.pieces_string])
+        return ' '.join([self.turn_string, self.rules_string, self.pieces_string])
 
     def empty_square(self, square):
         self.gen.piece("empty", square)
