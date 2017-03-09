@@ -134,7 +134,7 @@ class GameState:
                         continue
                     squares_to_add = int(char)
                     if passed_one_flag:
-                        squares_to_add += 9
+                        squares_to_add += 10
                         passed_one_flag = False
                     elif int(char) == 1:
                         passed_one_flag = True
@@ -157,7 +157,7 @@ class GameState:
 
     def serialize_board_string(self):
         output = ''
-        pointer = self.rules["row_len"] + 1
+        pointer = self.rules["row_len"] + 2
         consecutive_empty = 0
         for _ in range(self.rules["board_height"]):
             for __ in range(self.rules["board_width"]):
@@ -176,7 +176,8 @@ class GameState:
             if consecutive_empty:
                 output += str(consecutive_empty)
                 consecutive_empty = 0
-            output += '/'
+            if pointer / self.rules["row_len"] <= self.rules["board_height"]:
+                output += '/'
             pointer -= self.rules["board_width"]
             pointer += self.rules["row_len"]
         self.board_string = output
