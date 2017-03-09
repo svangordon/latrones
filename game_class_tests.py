@@ -131,7 +131,6 @@ class TestHandleMove(unittest.TestCase):
     def test_simple_untrap(self):
         test_fens = self.test_fens["simple_untrap"]
         game = GameState(test_fens["start"])
-        print(test_fens["move"])
         game.handle_move(test_fens["move"])
         self.assertEqual(test_fens["end"], game.fen_string)
 

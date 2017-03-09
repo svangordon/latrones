@@ -312,8 +312,7 @@ class GamePiece:
         Probably should move this to the game class, but it works here.
         """
         if self.game.rules["trapping"]:
-            raise ValueError('bang')
-            [neighbor.untrap() for neighbor in self.get_neighbors() if neighbor.trapped and self.position in neighbor.get_sandwichers() and len(neighbor.get_sandwichers()) == 2]
+            [neighbor.untrap() for neighbor in self.get_neighbors() if neighbor.trapped and self in neighbor.get_sandwichers() and len(neighbor.get_sandwichers()) == 2]
         self.game.empty_square(self.position)
         self.position = None
 
@@ -413,7 +412,6 @@ class GamePiece:
     def validate_non_jump(self, end_coord):
         direction = self.determine_direction(end_coord)
         move_pattern = self.move_pattern if self.owner == 0 else reverse(self.move_pattern)
-        print('===', direction, '===', move_pattern)
         if not move_pattern[int(direction)]:
             raise ValueError("attempting non-jump in invalid direction")
 
