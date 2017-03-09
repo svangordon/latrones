@@ -312,6 +312,7 @@ class GamePiece:
         Probably should move this to the game class, but it works here.
         """
         if self.game.rules["trapping"]:
+            raise ValueError('bang')
             [neighbor.untrap() for neighbor in self.get_neighbors() if neighbor.trapped and self.position in neighbor.get_sandwichers() and len(neighbor.get_sandwichers()) == 2]
         self.game.empty_square(self.position)
         self.position = None
