@@ -168,19 +168,21 @@ class GameState:
         consecutive_empty = 0
         for _ in range(self.rules["board_height"]):
             for __ in range(self.rules["board_width"]):
-                if not self.turn["board"][pointer].occupied:
+                square = self.square(pointer)
+                if square.char == "empty":
                     consecutive_empty += 1
                 else:
                     if consecutive_empty:
                         output += str(self.convert_char(consecutive_empty))
                         consecutive_empty = 0
-                    if self.turn["board"][pointer].trapped:
-                        output += '*'
-                    char = self.turn["board"][pointer].char
-                    if self.turn["board"][pointer].owner == 0:
-                        output += self.turn["board"][pointer].char.lower()
-                    else:
-                        output += self.turn["board"][pointer].char.upper()
+                    output += square.char
+                    # if self.turn["board"][pointer].trapped:
+                        # output += '*'
+                    # char = self.turn["board"][pointer].char
+                    # if self.turn["board"][pointer].owner == 0:
+                        # output += self.turn["board"][pointer].char.lower()
+                    # else:
+                        # output += self.turn["board"][pointer].char.upper()
                 pointer += 1
             if consecutive_empty:
                 output += str(self.convert_char(consecutive_empty))
@@ -227,7 +229,7 @@ class PieceGenerator:
         props = dict(input_props)
         props["occupied"] = True
         props["valid"] = True
-        self.pieces[props["char"]] = props
+        self.pieces[props["type"]] = props
 
     def piece(self, piece_name, position, trapped=False):
         # raise ValueError(self.pieces)
@@ -253,16 +255,15 @@ class GamePiece:
         self.position = position
         self.occupied = props["occupied"]
         self.valid = props["valid"]
+        self.type = props["type"]
         if self.occupied:
             self.owner = props["owner"]
             self.trapped = props["trapped"]
-            self.type = props["type"]
             self.move_pattern = props["move_pattern"]
             self.jump_pattern = props["jump_pattern"]
         else:
             self.owner = None
             self.trapped = None
-            self.type = None
             self.move_pattern = None
             self.jump_pattern = None
 
