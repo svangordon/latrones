@@ -78,7 +78,7 @@ class TestHandleMove(unittest.TestCase):
             "move": "b2 c2"
         }, {
             "start": "c/1oa/1oa/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
-            "end":   "c/c/1oa/1oa/1c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
+            "end":   "c/c/1oa/1oa/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
             "move": "b2 b4"
         }, {
             "start": "c/1oa/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f",
@@ -92,11 +92,11 @@ class TestHandleMove(unittest.TestCase):
         game.handle_move(test_fens["move"])
         self.assertEqual(test_fens["end"], game.fen_string)
 
-    # def test_simple_jump(self):
-    #     test_fens = self.test_fens[1]
-    #     game = GameState(test_fens["start"])
-    #     game.handle_move(test_fens["move"])
-    #     self.assertEqual(test_fens["end"], game.fen_string)
+    def test_simple_jump(self):
+        test_fens = self.test_fens[1]
+        game = GameState(test_fens["start"])
+        game.handle_move(test_fens["move"])
+        self.assertEqual(test_fens["end"], game.fen_string)
 
     # def test_invalid_move(self):
     #     test_fens = self.test_fens[1]
