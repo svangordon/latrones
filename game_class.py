@@ -3,7 +3,7 @@ from string import ascii_lowercase
 class GameState:
 
     fen_strings = {
-        "standard": "12/12/12/12/12/12/12/12,0,0,0 12,8,12,d,-4,T o/1101/1121/2/f" #seperate pieces w/ comma
+        "standard": "c/c/c/c/c/c/c/c,0,0,0 12,8,12,d,-4,T o/1101/1121/2/f" #seperate pieces w/ comma
     }
     turn_cols = ('board', 'active_player', 'half_move_clock', 'full_move_clock')
     rules_cols = ('board_width', 'board_height', 'stone_count','capture', 'win_condition', 'trapping')
@@ -36,9 +36,10 @@ class GameState:
         except ValueError:
             return chars.index(char)
 
-    def serialize_fen_string(self):
+    @property
+    def fen_string(self):
         self.serialize_turn_string()
-        self.fen_string = ' '.join([self.turn_string, self.rules_string, self.pieces_string])
+        # self.fen_string = ' '.join([self.turn_string, self.rules_string, self.pieces_string])
         return ' '.join([self.turn_string, self.rules_string, self.pieces_string])
 
     def empty_square(self, square):
