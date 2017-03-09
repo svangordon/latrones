@@ -337,8 +337,8 @@ class GamePiece:
         self.trapped = False
 
     def trap(self):
-        [neighbor.untrap() for neighbor in self.neighbors() if neighbor.trapped and self.position in neighbor.get_sandwichers() and len(neighbor.get_sandwichers()) == 2]
-        # self.trapped = True
+        [neighbor.untrap() for neighbor in self.get_neighbors() if neighbor.trapped and self.position in neighbor.get_sandwichers() and len(neighbor.get_sandwichers()) == 2]
+        self.trapped = True
         # self.checked = True
 
 
