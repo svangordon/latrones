@@ -13,7 +13,12 @@ class TestConvertChar(unittest.TestCase):
     def test_dec_to_hex(self):
         for val in self.vals:
             self.assertEqual(self.game.convert_char(val[1]), val[0])
-            
+    def test_convert_string(self):
+        """ should throw on trying to convert a piece """
+        with self.assertRaises(ValueError):
+            for char in "oOgGlL":
+                self.game.convert_char(char)
+
 class TestDetermineDirection(unittest.TestCase):
 
     def setUp(self):
