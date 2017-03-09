@@ -96,6 +96,10 @@ class TestHandleMove(unittest.TestCase):
             "start":    "c/1o*Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
             "end":      "c/o1Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
             "move":     "b2 a2"
+        }, "complex_untrap": {
+            "start":    "c/O*oO1o7/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
+            "end":      "c/Oo*Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
+            "move":     "e2 d2"
         }}
 
     def test_simple_move(self):
@@ -129,6 +133,12 @@ class TestHandleMove(unittest.TestCase):
         self.assertEqual(test_fens["end"], game.fen_string)
 
     def test_simple_untrap(self):
+        test_fens = self.test_fens["simple_untrap"]
+        game = GameState(test_fens["start"])
+        game.handle_move(test_fens["move"])
+        self.assertEqual(test_fens["end"], game.fen_string)
+
+    def test_complex_untrap(self):
         test_fens = self.test_fens["simple_untrap"]
         game = GameState(test_fens["start"])
         game.handle_move(test_fens["move"])
