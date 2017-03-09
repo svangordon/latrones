@@ -242,7 +242,6 @@ class PieceGenerator:
         else:
             props["owner"] = None
         props["trapped"] = trapped
-        # print("===", , "===")
         self.game.turn["board"][position] = GamePiece(self.game, props, position)
         # if position == 30:
             # raise ValueError('===', GamePiece(self.game, props, position), '===')
@@ -273,7 +272,7 @@ class GamePiece:
         if self.type in ["empty", "invalid"]:
             return self.type
         if self.trapped:
-            ouput += '*'
+            output += '*'
         if self.owner == 1:
             output += self.type.upper()
         else:
@@ -320,12 +319,10 @@ class GamePiece:
     def add_self(self, square):
         self.position = square
         self.game.turn["board"][self.position] = self
-        print([neighbor for neighbor in self.get_neighbors() if self in neighbor.get_sandwichers()])
         [neighbor.sandwich() for neighbor in self.get_neighbors() if self in neighbor.get_sandwichers()]
 
     def sandwich(self):
         """ The piece handles itself being sandwiched """
-        print("===", self.position, "is sandwiched", '===')
         if self.game.rules["capture"] == "custodial_capture":
             self.remove_self()
         if self.game.rules["trapping"]:
@@ -371,7 +368,6 @@ class GamePiece:
         return True
 
     def validate_jump(self, start_coord, end_coord):
-        # print("validating jump", start_coord, end_coord)
         board = self.game.turn["board"]
         start_square = self.game.square(start_coord)
         end_square = self.game.square(end_coord)
@@ -440,7 +436,6 @@ class GamePiece:
 
     def get_neighbors(self):
         """ Return list of references to neighboring squares, starting at north and going clockwise """
-        # print([self.position - self.game.rules["row_len"], self.position + 1, self.position + self.game.rules["row_len"], self.position - 1])
         return list(map(self.game.square, [self.position - self.game.rules["row_len"], self.position + 1, self.position + self.game.rules["row_len"], self.position - 1]))
 
     def get_sandwichers(self):
@@ -454,9 +449,3 @@ class GamePiece:
             and (not self.game.rules["trapping"] or True not in [pair[0].trapped, pair[1].trapped]):
                 results.extend([*pair])
         return results
-
-game = GameState("12/1o10/12/12/12/12/12/12,0,0,1 12,8,12,d,-4,T o/1101/1121/2/f")
-# print(type(game.turn["board"]))
-# for i in range(len(game.turn["board"])):
-    # square = game.turn["board"][i]
-    # print(i, square.valid, square.occupied, square.owner, square.char)
