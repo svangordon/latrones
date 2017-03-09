@@ -98,11 +98,11 @@ class TestHandleMove(unittest.TestCase):
         game.handle_move(test_fens["move"])
         self.assertEqual(test_fens["end"], game.fen_string)
 
-    # def test_invalid_move(self):
-    #     test_fens = self.test_fens[1]
-    #     game = GameState(test_fens["start"])
-    #     # with self.assertRaises(ValueError):
-    #     game.handle_move(test_fens["move"])
+    def test_invalid_move(self):
+        test_fens = self.test_fens[2]
+        game = GameState(test_fens["start"])
+        with self.assertRaises(ValueError):
+            game.handle_move(test_fens["move"])
 
 if __name__ == '__main__':
     unittest.main()

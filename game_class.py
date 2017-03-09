@@ -362,30 +362,31 @@ class GamePiece:
         try:
             self.validate_non_jump(*squares)
         except ValueError:
+            self.validate_jump(self.position, squares[0])
             for square in squares [:-1]:
                 if self.game["board"][square]["occupied"]:
                     raise ValueError("attempting to jump through occupied square")
-                    self.validate_jump(self.position, squares[0])
-                    for i in range(1, len(squares)):
-                        self.validate_jump(squares[i - 1], squares[i])
+            for i in range(1, len(squares)):
+                self.validate_jump(squares[i - 1], squares[i])
         # if len(squares) >= 2:
         # else:
         # passed all the tests
         return True
 
     def validate_jump(self, start_coord, end_coord):
-        board = game.turn["board"]
-        origin_square = board[start_coord]
-        end_square = board[end_coord]
+        # print("validating jump", start_coord, end_coord)
+        board = self.game.turn["board"]
+        start_square = self.game.square(start_coord)
+        end_square = self.game.square(end_coord)
         jump_pattern = self.jump_pattern if self.owner == 0 else reverse(self.jump_pattern)
-        if end_coord == start_square + 2:
-            jumped_coord = start_square + 1
-        elif end_coord == start_square - 2:
-            jumped_coord = start_square - 1
-        elif end_coord == start_square - self.game.turn["row_len"]*2:
-            jumped_coord = start_square - self.game.turn["row_len"]
-        elif end_coord == start_square + self.game.turn["row_len"]*2:
-            jumped_coord == start_square + self.game.turn["row_len"]
+        if end_coord == start_coord + 2:
+            jumped_coord = start_coord + 1
+        elif end_coord == start_coord - 2:
+            jumped_coord = start_coord - 1
+        elif end_coord == start_coord - self.game.rules["row_len"]*2:
+            jumped_coord = start_coord - self.game.rules["row_len"]
+        elif end_coord == start_coord + self.game.rules["row_len"]*2:
+            jumped_coord = start_coord + self.game.rules["row_len"]
         else:
             raise ValueError("bad jump coord")
         jumped_square = board[jumped_coord]
