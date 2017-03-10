@@ -3,12 +3,9 @@ import constants
 from game_class import GameState
 from string import Template
 import MySQLdb
-cnx = MySQLdb.connect(host="localhost", user="igoinu", passwd="password", db="latr")
-queries = {
-"create_game": """INSERT INTO game (initial_fen) "{initial_fen}";""",
-"get_game": """""",
-"get_participants": """SELECT * FROM participant WHERE game_id = {game_id}"""
-}
+from db import cnx
+# cnx = MySQLdb.connect(host="localhost", user="igoinu", passwd="password", db="latr")
+from pprint import pprint
 
 
 class Participant:
@@ -33,7 +30,6 @@ class Resource:
         cnx.commit()
         cur.execute("SELECT LAST_INSERT_ID();")
         self.resource_id = cur.fetchone()[0]
-        # print("row", row)
         cur.close()
 
     def read(self):
@@ -63,9 +59,9 @@ class Game(Resource):
     "get_moves": Template("""SELECT * FROM move WHERE game_id = $resource_id ORDER BY half_move_clock"""),
     "get_participants": Template("""SELECT * FROM participant WHERE game_id = $resource_id"""),
     "join": Template("""INSERT INTO participant (user_id, game_id, color) VALUES ($user_id, $game_id, $color)"""),
-    "add_move": Template("""INSERT INTO move (game_id, participant_id, fen, half_move_clock, notation) VALUES ($game_id, $participant_id, "$fen", $half_move_clock, "$notation")""")
+    "make_move": Template("""INSERT INTO move (game_id, participant_id, fen, half_move_clock, notation) VALUES ($game_id, $participant_id, "$fen", $half_move_clock, "$notation")""")
     }
-    default_options = {"initial_fen": "oooooooooooo/c/c/c/c/c/c/OOOOOOOOOOOO,0,0,0 12,8,12,d,-4,T o/1110/1121/2/f"}
+    default_options = {"initial_fen": "oooooooooooo/c/c/c/c/c/c/OOOOOOOOOOOO,0,0,0 12,8,12,d,-4,T o/0111/2111/2/f"}
     move_cols = ("move_id", "game_id", "participant_id", "fen", "half_move_clock", "notation")
     user_cols = ("participant_id", "user_id", "game_id", "color")
     resource_cols = ("game_id", "start_time", "initial_fen")
@@ -98,7 +94,7 @@ class Game(Resource):
 
     def make_move(self, user_id, move):
         cur = cnx.cursor()
-        participant_id = [participant for participant in self.participants if participant["user_id"] == user_id][0]
+        participant_id = [participant for participant in self.participants if participant["user_id"] == user_id][0]["participant_id"]
         # Need some kind of more thorough veting to make sure the right user is making moves?
         color = [participant["color"] for participant in self.participants if participant["user_id"] == user_id][0]
         try:
@@ -106,10 +102,10 @@ class Game(Resource):
         except IndexError:
             game_state = GameState(self.read()["initial_fen"])
         game_state.handle_move(move)
-        values = dict(zip(("game_id", "participant_id", "fen", "half_move_clock", "notation"), (self.resource_id, participant_id, game_state.fen_string, game_state.half_move, move)))
+        values = dict(zip(("game_id", "participant_id", "fen", "half_move_clock", "notation"), (self.resource_id, participant_id, game_state.fen_string, game_state.turn["half_move_clock"], move)))
         query = self.query_templates["make_move"].substitute(values)
         cur.execute(query)
-        cur.commit()
+        cnx.commit()
         cur.close()
 
     # def begin_game(self):
