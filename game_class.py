@@ -428,7 +428,7 @@ class GamePiece:
         steps = [row_step, row_step**0, -row_step**0, -row_step] # this order is probably wrong
         step = steps[direction]
         if end_coord != self.position + step and move_pattern[direction] != 2:
-            raise ValueError("piece with move pattern attempting to move more than 1 space: \n", "end_coord", end_coord, 'self.position', self.position, 'step', step, 'move_pattern[direction]',move_pattern[direction], 'direction',direction)
+            raise ValueError("piece with move pattern attempting to move more than 1 space:", step)
         cnt = 1
         while True:
             self.validate_square_entry(self.position + step*cnt)
