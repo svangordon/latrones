@@ -17,11 +17,20 @@ sql_templates = {
         "get_all": """SELECT * FROM {users_table}"""
    },
    "game": {
-        "create_game": """INSERT INTO {game_table} (board_width, board_height) VALUES ({board_width}, {board_height})""",
-        "delete_game": """DELETE FROM {game_table} WHERE game_id = {game_id}""",
-        "get_all_games": """SELECT * FROM {game_table}""",
-        "get_game_by_id": """SELECT * FROM {game_table} WHERE game_id = {game_id}""",
-        "get_by_user": """SELECT * FROM game WHERE game_id IN (SELECT game_id FROM participant WHERE user_id={user_id});"""
+        # # "create_game": """INSERT INTO {game_table} (board_width, board_height) VALUES ({board_width}, {board_height})""",
+        # "create_game": """INSERT INTO game () VALUES ();
+        # SET @game_id = LAST_INSERT_ID();
+        # INSERT INTO participant (game_id, user_id, color) VALUES (@game_id, {user_id}, {color});
+        # SET @participant_id = LAST_INSERT_ID();
+        # SELECT LAST_INSERT_ID();""",
+        # INSERT INTO move (game_id, participant_id, fen) VALUES (@game_id, @participant_id, {fen_string});""",
+        "get_game": """SELECT * FROM game WHERE game_id = {game_id};""",
+        "get_participants": """SELECT * FROM participant WHERE game_id = {game_id};""",
+        "get_moves": """SELECT * FROM move WHERE game_id = {game_id}"""
+        # "delete_game": """DELETE FROM {game_table} WHERE game_id = {game_id};
+        # SELECT @game_id;""",
+        # "get_all_games": """SELECT * FROM {game_table}""",
+        # "get_by_user": """SELECT * FROM game WHERE game_id IN (SELECT game_id FROM participant WHERE user_id={user_id});"""
    },
    "participant": {
         "create_participant": """INSERT INTO {participant_table} (game_id, user_id) VALUES ({game_id}, {user_id})""",

@@ -212,3 +212,44 @@ ordinarii:
 o,1101,1121,J,2,f
 
 [piece_char][]
+
+Okay, general flow:
+
+-- user1 creates game.
+-- user2 hits "get_open_games"
+-- user2 hits join_game/<game_id> (which is probably just like add_participant)
+-- user1 hits game/ID, sees that there's another dude there (so do some kind of join in the get_game query)
+-- user1 sends move
+-- user2 sends move
+-- check that the board looks like it should
+
+API Methods That Will be Needed by Client:
+-- Create game
+-- Get open games
+-- Join game
+-- Get game(game_id) # acts as poll method (so needs to join all moves)
+-- Get user_profile
+-- Create user
+-- Update user
+-- Send Move (also used for sending resignation, cancel, etc(?))
+
+
+And I think that's it. That's the absolute minimum.
+
+POST /game : create game
+GET /game : get open games
+PUT /game/<game_id> : join game
+GET /game/<game_id> : get/poll game
+
+
+
+Thought:
+-- What if I created and used objects? that could work. So there would be a Game
+object, a Participant object, a Move object, etc. Then we could also sort of separate
+some of the functionality (ie, the resources and the way of hitting the resource)
+
+Classes:
+-- User
+-- Participant
+-- Game
+-- Move
