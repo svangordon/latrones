@@ -211,7 +211,10 @@ class GameState:
             return row*(self.rules["row_len"]) + col
         move = list(map(map_move,move_string.split(' ')))
         self.turn["board"][move[0]].make_move(*move[1:])
-
+        self.turn["half_move_clock"] += 1
+        if self.turn["active_player"] == 1:
+            self.turn["full_move_clock"] += 1
+        self.turn["active_player"] = (self.turn["active_player"] + 1) % 2
         # self.turn["board"][move_start].make_move(move_end)
 
 class PieceGenerator:
@@ -264,8 +267,12 @@ class GamePiece:
         if self.occupied:
             self.owner = props["owner"]
             self.trapped = props["trapped"]
-            self.move_pattern = props["move_pattern"]
-            self.jump_pattern = props["jump_pattern"]
+            if self.owner == 0:
+                self.move_pattern = props["move_pattern"]
+                self.jump_pattern = props["jump_pattern"]
+            if self.owner == 1:
+                self.move_pattern = props["move_pattern"][::-1]
+                self.jump_pattern = props["jump_pattern"][::-1]
         else:
             self.owner = None
             self.trapped = None
@@ -377,7 +384,7 @@ class GamePiece:
         board = self.game.turn["board"]
         start_square = self.game.square(start_coord)
         end_square = self.game.square(end_coord)
-        jump_pattern = self.jump_pattern if self.owner == 0 else reverse(self.jump_pattern)
+        # jump_pattern = self.jump_pattern if self.owner == 0 else self.jump_pattern.copy().reverse()
         if end_coord == start_coord + 2:
             jumped_coord = start_coord + 1
         elif end_coord == start_coord - 2:
@@ -401,7 +408,7 @@ class GamePiece:
         if self.trapped and not self.trapped_jump:
             raise ValueError("trapped piece attempting to jump")
 
-        if jump_pattern[direction] not in allowed_jump_vals:
+        if self.jump_pattern[direction] not in allowed_jump_vals:
             raise ValueError("bad jump_pattern value", direction, self.jump_pattern[direction])
 
     def validate_square_entry(self, end_coord):
@@ -417,9 +424,10 @@ class GamePiece:
 
     def validate_non_jump(self, end_coord):
         direction = self.determine_direction(end_coord)
-        move_pattern = self.move_pattern if self.owner == 0 else reverse(self.move_pattern)
+        move_pattern = self.move_pattern
+        # move_pattern = self.move_pattern if self.owner == 0 else reverse(self.move_pattern)
         if not move_pattern[int(direction)]:
-            raise ValueError("attempting non-jump in invalid direction")
+            raise ValueError("attempting non-jump in invalid direction", direction, move_pattern, self.position, end_coord, self.owner)
 
         if self.game.turn["active_player"] == 1:
             row_step = -self.game["rules"]["row_len"]

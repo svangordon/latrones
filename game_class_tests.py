@@ -74,11 +74,11 @@ class TestHandleMove(unittest.TestCase):
     def setUp(self):
         self.test_fens = {"simple_move": {
             "start": "c/1oa/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
-            "end":   "c/2o9/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
+            "end":   "c/2o9/c/c/c/c/c/c,1,1,1 12,8,12,d,-4,T o/1110/1121/2/f",
             "move": "b2 c2"
         }, "simple_jump": {
             "start": "c/1oa/1oa/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
-            "end":   "c/c/1oa/1oa/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
+            "end":   "c/c/1oa/1oa/c/c/c/c,1,1,1 12,8,12,d,-4,T o/1110/1121/2/f",
             "move": "b2 b4"
         }, "invalid_move": {
             "start": "c/1oa/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
@@ -86,19 +86,19 @@ class TestHandleMove(unittest.TestCase):
             "move": "b2 e8"
         }, "simple_displacement_capture": {
             "start": "c/1o*Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
-            "end":   "c/2oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
+            "end":   "c/2oo8/c/c/c/c/c/c,1,1,1 12,8,12,d,-4,T o/1110/1121/2/f",
             "move": "b2 c2"
         }, "simple_trap": {
             "start": "c/o1Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
-            "end":   "c/1o*Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
+            "end":   "c/1o*Oo8/c/c/c/c/c/c,1,1,1 12,8,12,d,-4,T o/1110/1121/2/f",
             "move": "a2 b2"
         }, "simple_untrap": {
             "start":    "c/1o*Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
-            "end":      "c/o1Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
+            "end":      "c/o1Oo8/c/c/c/c/c/c,1,1,1 12,8,12,d,-4,T o/1110/1121/2/f",
             "move":     "b2 a2"
         }, "complex_untrap": {
             "start":    "c/O*oO1o7/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
-            "end":      "c/Oo*Oo8/c/c/c/c/c/c,0,0,1 12,8,12,d,-4,T o/1110/1121/2/f",
+            "end":      "c/Oo*Oo8/c/c/c/c/c/c,1,1,1 12,8,12,d,-4,T o/1110/1121/2/f",
             "move":     "e2 d2"
         }}
 
@@ -154,8 +154,10 @@ class TestSandwichers(unittest.TestCase):
 class TestStandardBoard(unittest.TestCase):
     def test_simple_move(self):
         game = GameState("standard", True)
-        print("===",vars(game.square("a1")),"===")
+        # print("===",vars(game.square("a1")),"===")
         game.handle_move("a1 a2")
+        game.handle_move("l8 l7")
+        self.assertEqual(game.fen_string, "1ooooooooooo/ob/c/c/c/c/aO1/OOOOOOOOOO1O,0,0,0 12,8,12,d,-4,T o/1110/1121/2/f")
 
 if __name__ == '__main__':
     unittest.main()
