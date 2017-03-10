@@ -430,7 +430,7 @@ class GamePiece:
             raise ValueError("attempting non-jump in invalid direction", direction, move_pattern, self.position, end_coord, self.owner)
 
         if self.game.turn["active_player"] == 1:
-            row_step = -self.game["rules"]["row_len"]
+            row_step = -self.game.rules["row_len"]
         else:
             row_step = self.game.rules["row_len"]
         steps = [-row_step, row_step**0, -row_step**0, row_step] # this order is probably wrong
