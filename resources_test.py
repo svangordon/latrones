@@ -20,10 +20,8 @@ class TestCreateGame(unittest.TestCase):
         self.game.make_move(22, "k8 k7")
         self.assertEqual(self.game.moves[-1]["fen"], "1ooooooooooo/ob/c/c/c/c/aO1/OOOOOOOOOO1O,0,2,1 12,8,12,d,-4,T o/0111/2111/2/f")
 
-    # def tearDown(self):
-        # cur = cnx.cursor()
-        # cur.execute("""DELETE FROM game WHERE game_id = {0}""".format(self.game.resource_id))
-        # cur.execute("DELETE FROM ")
+    def tearDown(self):
+        self.game.delete()
 
 if __name__ == '__main__':
     unittest.main()
