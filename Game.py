@@ -40,10 +40,11 @@ class Resource:
 
     def delete(self):
         """ Have a resource delete itself """
-        query = self.queries["delete"].substitute(resource_id=self.resource_id)
         cur = cnx.cursor()
-        cur.execute(query)
-        cnx.commit()
+        for template in self.queries["delete"]:
+            query = template.substitute(resource_id=self.resource_id)
+            cur.execute(query)
+            cnx.commit()
         cur.close()
 
 class Participant(Resource):
@@ -97,9 +98,9 @@ class Game(Resource):
     queries = {
     "create": Template("""INSERT INTO game (initial_fen, game_status) VALUES ("$initial_fen", 0);"""),
     "read": Template("""SELECT * FROM game WHERE game_id = $resource_id"""),
-    "delete": Template("""DELETE FROM participant WHERE game_id = $resource_id;
-    DELETE FROM move WHERE game_id = $resource_id;
-    DELETE FROM game WHERE game_id = $resource_id;"""),
+    "delete": [Template("""DELETE FROM participant WHERE game_id = $resource_id;"""),
+    Template("""DELETE FROM move WHERE game_id = $resource_id;"""),
+    Template("""DELETE FROM game WHERE game_id = $resource_id;""")],
     "get_moves": Template("""SELECT * FROM move WHERE game_id = $resource_id ORDER BY half_move_clock"""),
     "get_participants": Template("""SELECT * FROM participant WHERE game_id = $resource_id"""),
     "join": Template("""INSERT INTO participant (user_id, game_id, color) VALUES ($user_id, $game_id, $color)"""),
@@ -152,8 +153,6 @@ class Game(Resource):
         cnx.commit()
         cur.close()
 
-    def delete(self):
-        """Delete the game and any moves or participants associated with it (sorta drastic)"""
 
     # def begin_game(self):
     #     if
