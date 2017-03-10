@@ -65,7 +65,7 @@ class Game(Resource):
     "join": Template("""INSERT INTO participant (user_id, game_id, color) VALUES ($user_id, $game_id, $color)"""),
     "add_move": Template("""INSERT INTO move (game_id, participant_id, fen, half_move_clock, notation) VALUES ($game_id, $participant_id, "$fen", $half_move_clock, "$notation")""")
     }
-    default_options = {"initial_fen": "c/c/c/c/c/c/c/c,0,0,0 12,8,12,d,-4,T o/1110/1121/2/f"}
+    default_options = {"initial_fen": "oooooooooooo/c/c/c/c/c/c/OOOOOOOOOOOO,0,0,0 12,8,12,d,-4,T o/1110/1121/2/f"}
     move_cols = ("move_id", "game_id", "participant_id", "fen", "half_move_clock", "notation")
     user_cols = ("participant_id", "user_id", "game_id", "color")
     resource_cols = ("game_id", "start_time", "initial_fen")
@@ -96,13 +96,21 @@ class Game(Resource):
         cur.execute(query)
         cur.close()
 
-    def make_move(self, participant_id, move):
+    def make_move(self, user_id, move):
         cur = cnx.cursor()
+        participant_id = [participant for participant in self.participants if participant["user_id"] == user_id][0]
         # Need some kind of more thorough veting to make sure the right user is making moves?
-        color = [participant["color"] for participant in self.participants if participant.user_id == user_id][0]
-        game_state = GameState(self.moves[-1]["fen"])
+        color = [participant["color"] for participant in self.participants if participant["user_id"] == user_id][0]
+        try:
+            game_state = GameState(self.moves[-1]["fen"])
+        except IndexError:
+            game_state = GameState(self.read()["initial_fen"])
         game_state.handle_move(move)
         values = dict(zip(("game_id", "participant_id", "fen", "half_move_clock", "notation"), (self.resource_id, participant_id, game_state.fen_string, game_state.half_move, move)))
         query = self.query_templates["make_move"].substitute(values)
         cur.execute(query)
+        cur.commit()
         cur.close()
+
+    # def begin_game(self):
+    #     if
