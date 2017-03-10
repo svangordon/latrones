@@ -429,14 +429,14 @@ class GamePiece:
         if not move_pattern[int(direction)]:
             raise ValueError("attempting non-jump in invalid direction", direction, move_pattern, self.position, end_coord, self.owner)
 
-        if self.game.turn["active_player"] == 1:
-            row_step = -self.game.rules["row_len"]
-        else:
-            row_step = self.game.rules["row_len"]
+        # if self.game.turn["active_player"] == 1:
+            # row_step = -self.game.rules["row_len"]
+        # else:
+        row_step = self.game.rules["row_len"]
         steps = [-row_step, row_step**0, -row_step**0, row_step] # this order is probably wrong
         step = steps[direction]
         if end_coord != self.position + step and move_pattern[direction] != 2:
-            raise ValueError("piece with move pattern attempting to move more than 1 space:", step)
+            raise ValueError("piece with move pattern attempting to move more than 1 space:", step, direction)
         cnt = 1
         while True:
             self.validate_square_entry(self.position + step*cnt)
