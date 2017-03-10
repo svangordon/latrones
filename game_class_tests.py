@@ -27,11 +27,11 @@ class TestDeserializeBoard(unittest.TestCase):
             "c/ob/2o*Oo7/bO/b*o/bO/bO/c,0,0,0 12,8,12,d,-4,T o/1110/1121/2/f"
             ]
 
-    def test_empty_board(self):
-        test_fen = self.test_fens[0]
-        game = GameState(test_fen)
-        self.assertEqual(game.fen_string, test_fen)
-        self.assertEqual(GameState("standard", True).fen_string, test_fen)
+    # def test_empty_board(self):
+    #     test_fen = self.test_fens[0]
+    #     game = GameState(test_fen)
+    #     self.assertEqual(game.fen_string, test_fen)
+    #     self.assertEqual(GameState("standard", True).fen_string, test_fen)
 
     def test_populated_board(self):
         test_fen = self.test_fens[0]
@@ -151,6 +151,11 @@ class TestSandwichers(unittest.TestCase):
         game = GameState(fen)
         self.assertEqual([square.position for square in game.square(31).get_sandwichers()], expected)
 
+class TestStandardBoard(unittest.TestCase):
+    def test_simple_move(self):
+        game = GameState("standard", True)
+        print("===",vars(game.square("a1")),"===")
+        game.handle_move("a1 a2")
 
 if __name__ == '__main__':
     unittest.main()

@@ -3,7 +3,7 @@ from string import ascii_lowercase
 class GameState:
 
     fen_strings = {
-        "standard": "oooooooooooo/c/c/c/c/c/c/OOOOOOOOOOOO,0,0,0 12,8,12,d,-4,T o/1110/1121/2/f" #seperate pieces w/ comma
+        "standard": "oooooooooooo/c/c/c/c/c/c/OOOOOOOOOOOO,0,0,0 12,8,12,d,-4,T o/0111/2111/2/f" #seperate pieces w/ comma
     }
     turn_cols = ('board', 'active_player', 'half_move_clock', 'full_move_clock')
     rules_cols = ('board_width', 'board_height', 'stone_count','capture', 'win_condition', 'trapping')
@@ -46,7 +46,13 @@ class GameState:
         self.gen.piece("empty", square)
 
     def square(self, square):
-        return self.turn["board"][square]
+        try:
+            return self.turn["board"][int(square)]
+        except ValueError:
+            col = int(ascii_lowercase.find(square[0])) + 1 # dummy col
+            row = int(square[1:])
+            square = row*(self.rules["row_len"]) + col
+            return self.turn["board"][square]
 
     def deserialize_rules(self):
         rules = dict(zip(self.rules_cols, self.rules_string.split(',')))
