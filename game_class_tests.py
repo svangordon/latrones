@@ -156,7 +156,7 @@ class TestStandardBoard(unittest.TestCase):
         game = GameState("standard", True)
         # print("===",vars(game.square("a1")),"===")
         game.handle_move("a1 a2")
-        game.handle_move("l8 l7")
+        game.handle_move("k8 k7")
         self.assertEqual(game.fen_string, "1ooooooooooo/ob/c/c/c/c/aO1/OOOOOOOOOO1O,0,0,0 12,8,12,d,-4,T o/1110/1121/2/f")
 
 if __name__ == '__main__':
