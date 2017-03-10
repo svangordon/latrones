@@ -38,16 +38,16 @@ class Resource:
         cur.close()
         return row
 
-    def delete(self):
+    def delete(self, template_string="delete"):
         """ Have a resource delete itself """
         cur = cnx.cursor()
-        if isinstance(self.queries["delete"], list):
-            for template in self.queries["delete"]:
+        if isinstance(self.queries[template_string], list):
+            for template in self.queries[template_string]:
                 query = template.substitute(resource_id=self.resource_id)
                 cur.execute(query)
                 cnx.commit()
         else:
-            query = self.queries["delete"].substitute(resource_id=self.resource_id)
+            query = self.queries[template_string].substitute(resource_id=self.resource_id)
             cur.execute(query)
             cnx.commit()
         cur.close()
@@ -83,7 +83,7 @@ class User(Resource):
     "create": Template("""INSERT INTO user (username) VALUES ("$username");"""),
     "get_active_games": Template("""SELECT game.game_id, start_time, initial_fen, game_status FROM game LEFT JOIN (participant)
 	ON (game.game_id = participant.game_id AND participant.user_id = $user_id AND (game.game_status = 0 OR game.game_status = 1)) """)
-    "delete": Template("")
+    "delete": Template("""""")
     }
     def __init__(self, user_id=None):
         self.user_id = user_id
