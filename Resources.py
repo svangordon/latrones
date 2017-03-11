@@ -240,7 +240,7 @@ class Game(Resource):
         query = self.queries["get_participants"].substitute(resource_id=self.resource_id)
         cur.execute(query)
         for row in cur.fetchall():
-            output[row[3]] = Participant(row)
+            participants[row[3]] = Participant(row)
         # participants = [Participant(row) for row in cur.fetchall()]
         cur.close()
         return [participant for participant in participants if participant is not None]
