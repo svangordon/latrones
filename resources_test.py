@@ -60,7 +60,6 @@ class TestGame(unittest.TestCase):
             # User.clear(username)
         for username, user in self.users.items():
             user.create({"username": username})
-        self.game = Game()
 
     def test_join_game(self):
         # users = self.users.values()
@@ -68,7 +67,7 @@ class TestGame(unittest.TestCase):
         [user.join(game) for user in self.users.values()]
         self.assertEqual(len(game.participants), 2)
         self.assertEqual([user.resource_id for user in self.users.values()].sort(), [participant.user_id for participant in game.participants].sort())
-        [user.leave(self.game) for user in self.users.values()]
+        [user.leave(game) for user in self.users.values()]
         # self.assertEqual(game.participants, [])
         game.delete()
 
@@ -82,11 +81,11 @@ class TestGame(unittest.TestCase):
         game = Game()
         [user.join(game) for user in self.users.values()]
         self.assertEqual(len(game.participants), 2)
-        self.assertEqual(self.game.game_status, 1)
-        game.delete()
+        self.assertEqual(game.game_status, 1)
+        # game.delete()
 
     def tearDown(self):
-        self.game.delete()
+        # self.game.delete()
         [user.delete() for user in self.users.values()]
 
 if __name__ == '__main__':
