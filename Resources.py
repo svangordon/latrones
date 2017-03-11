@@ -55,10 +55,24 @@ class Resource:
 class Participant(Resource):
     queries = {
         "join": Template("""INSERT INTO participant (user_id, game_id, color) VALUES ($user_id, $game_id, $color)"""),
-        "leave": Template("""DELETE FROM participant WHERE game_id = $game_id AND user_id = $user_id""")
+        "leave": Template("""DELETE FROM participant WHERE game_id = $game_id AND user_id = $user_id"""),
+        "set_color": Template("""UPDATE participant SET color = $color WHERE participant_id = $resource_id""")
     }
-    def __init__(self, user_id):
-        self.user_id = user_id
+    resource_cols = ("participant_id", "user_id", "game_id", "color")
+    def __init__(self, participant_id=None):
+        self.resource_id = participant_id
+    @property
+    def color(self):
+        return self.read()["color"]
+    @color.setter
+    def color(self, color):
+        cur = cnx.cursor()
+        values = {"participant_id": self.resource_id, "color": color}
+        query = self.queries["set_color"].substitute(values)
+        cur.execute(query)
+        cnx.commit()
+        cur.close()
+
     def join(self, game_id, color=-1):
         cur = cnx.cursor()
         values = {"user_id": self.user_id, "game_id": game_id, "color": color}
@@ -77,15 +91,17 @@ class Participant(Resource):
         cur.execute(query)
         cnx.commit()
         cur.close()
+        del self.game_id
 
 class User(Resource):
     queries = {
     "create": Template("""INSERT INTO user (username) VALUES ("$username");"""),
+    "delete": Template("""DELETE FROM user WHERE user_id = $resource_id;"""),
     "get_active_games": Template("""SELECT game.game_id, start_time, initial_fen, game_status FROM game LEFT JOIN (participant)
 	ON (game.game_id = participant.game_id AND participant.user_id = $user_id AND (game.game_status = 0 OR game.game_status = 1));"""),
-    "delete": Template("""DELETE FROM user WHERE user_id = $resource_id;"""),
+    "get_by_id": Template("""SELECT * FROM user WHERE user_id = $identifier;"""),
     "get_by_username": Template("""SELECT * FROM user WHERE username = "$identifier";"""),
-    "get_by_id": Template("""SELECT * FROM user WHERE user_id = $identifier;""")
+    "join": Template("""INSERT INTO participant (user_id, game_id, color) VALUES ($user_id, $game_id, $color)""")
     }
     resource_cols = ("user_id", "username")
     def __init__(self, user_identifier=None):
@@ -116,6 +132,20 @@ class User(Resource):
         # user_data = cur.fetchone()
         # self.user_id = user_data[0]
         # self.username = user_data[1]
+
+    def join(self, game, color=-1):
+        try:
+            game = Game(int(game))
+        except TypeError:
+            pass
+        cur = cnx.cursor()
+        values = {"user_id": self.resource_id, "game_id": game.resource_id, "color": color}
+        query = self.queries["join"].substitute(values)
+        cur.execute(query)
+        cnx.commit()
+        cur.execute("SELECT * FROM LAST_INSERT_ID();")
+        game.add_participant(cur.fetchone())
+        cur.close()
 
     @property
     def resource_id(self):
@@ -172,7 +202,7 @@ class Game(Resource):
     }
     default_options = {"initial_fen": "oooooooooooo/c/c/c/c/c/c/OOOOOOOOOOOO,0,0,0 12,8,12,d,-4,T o/0111/2111/2/f"}
     move_cols = ("move_id", "game_id", "participant_id", "fen", "half_move_clock", "notation")
-    user_cols = ("participant_id", "user_id", "game_id", "color")
+    participant_cols = ("participant_id", "user_id", "game_id", "color")
     resource_cols = ("game_id", "start_time", "initial_fen")
 
     @property
@@ -192,6 +222,10 @@ class Game(Resource):
         moves = [dict(zip(self.user_cols, row)) for row in cur.fetchall()]
         cur.close()
         return moves
+
+    def start(self):
+        if len(participants) == 2:
+            # then we're all good to go.
 
     def join(self, user, color=-1):
         cur = cnx.cursor()
