@@ -151,6 +151,7 @@ class User(Resource):
         cur.execute("SELECT * FROM LAST_INSERT_ID();")
         game.add_participant(cur.fetchone())
         cur.close()
+        game.start() #NB: start does nothing if there's not two participants
 
     @property
     def resource_id(self):
@@ -203,7 +204,8 @@ class Game(Resource):
     "get_moves": Template("""SELECT * FROM move WHERE game_id = $resource_id ORDER BY half_move_clock"""),
     "get_participants": Template("""SELECT * FROM participant WHERE game_id = $resource_id"""),
     "join": Template("""INSERT INTO participant (user_id, game_id, color) VALUES ($user_id, $game_id, $color)"""),
-    "make_move": Template("""INSERT INTO move (game_id, participant_id, fen, half_move_clock, notation) VALUES ($game_id, $participant_id, "$fen", $half_move_clock, "$notation")""")
+    "make_move": Template("""INSERT INTO move (game_id, participant_id, fen, half_move_clock, notation) VALUES ($game_id, $participant_id, "$fen", $half_move_clock, "$notation")"""),
+    "update_game_status": Template("""UPDATE participant SET game_status = $game_status WHERE game_id = $resource_id""")
     }
     default_options = {"initial_fen": "oooooooooooo/c/c/c/c/c/c/OOOOOOOOOOOO,0,0,0 12,8,12,d,-4,T o/0111/2111/2/f"}
     move_cols = ("move_id", "game_id", "participant_id", "fen", "half_move_clock", "notation")
@@ -228,17 +230,36 @@ class Game(Resource):
         cur.close()
         return participants
 
-    def start(self):
-        if len(participants) == 2:
-            # then we're all good to go.
-
-    def join(self, user, color=-1):
+    @property
+    def game_status(self):
+        return self.read()["game_status"]
+    @game_status.setter
+    def game_status(self):
         cur = cnx.cursor()
-        values = {"user_id": user.resource_id, "game_id": self.resource_id, "color": color}
-        query = self.queries["join"].substitute(values)
-        # raise ValueError(query)
+        query = self.queries["update_game_status"].substitute(resource_id=self.resource_id, game_status=game_status)
         cur.execute(query)
+        cnx.commit()
         cur.close()
+
+    def start(self):
+        participants = self.participants # cache db call temporarily
+        if len(participants) < 2:
+            return # do nothing
+        colors = [0, 1]
+        shuffle(colors)
+        for i in range(2):
+            participants[i].color = colors[i]
+        self.game_status = 1
+
+
+    # def join(self, user, color=-1):
+    #     cur = cnx.cursor()
+    #     values = {"user_id": user.resource_id, "game_id": self.resource_id, "color": color}
+    #     query = self.queries["join"].substitute(values)
+    #     # raise ValueError(query)
+    #     cur.execute(query)
+    #     cnx.commit()
+    #     cur.close()
 
     def make_move(self, user, move):
         cur = cnx.cursor()
