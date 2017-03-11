@@ -1,4 +1,4 @@
-from Game import Game
+from Resources import Game, User, Participant, Move
 import unittest
 from db import cnx
 from pprint import pprint
@@ -22,6 +22,19 @@ class TestCreateGame(unittest.TestCase):
 
     def tearDown(self):
         self.game.delete()
+
+class TestFlow(unittest.TestCase):
+    def setUp(self):
+        self.username1 = "electric_wizard"
+        self.username2 = "dopethrone"
+
+    def test_create_user(self):
+        user1 = User()
+        user1.create(self.username1)
+        user2 = User()
+        user2.create(self.username2)
+
+
 
 if __name__ == '__main__':
     unittest.main()
