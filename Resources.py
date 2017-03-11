@@ -79,15 +79,15 @@ class Participant(Resource):
         cur.close()
         self._color = color
 
-    def join(self, game_id, color=-1):
-        cur = cnx.cursor()
-        values = {"user_id": self.user_id, "game_id": game_id, "color": color}
-        query = self.queries["join"].substitute(values)
-        cur.execute(query)
-        cnx.commit()
-        cur.execute("SELECT LAST_INSERT_ID();")
-        self.game_id = cur.fetchone()[2]
-        cur.close()
+    # def join(self, game_id, color=-1):
+    #     cur = cnx.cursor()
+    #     values = {"user_id": self.user_id, "game_id": game_id, "color": color}
+    #     query = self.queries["join"].substitute(values)
+    #     cur.execute(query)
+    #     cnx.commit()
+    #     cur.execute("SELECT LAST_INSERT_ID();")
+    #     self.game_id = cur.fetchone()[2]
+    #     cur.close()
     def leave(self, game_id=None):
         if not game_id:
             game_id = self.game_id
@@ -121,6 +121,14 @@ class User(Resource):
             self._resource_id = user["user_id"]
             self._username = user["username"]
 
+    @classmethod
+    def clear(self, username):
+        """ Delete a username. For testing purposes"""
+        cur = cnx.cursor()
+        cur.execute('DELETE FROM user WHERE username ="{0}";'.format(username))
+        cnx.commit()
+        cur.close()
+
     def read(self, identifier=None):
         if identifier is None:
             identifier = self.resource_id
@@ -133,6 +141,7 @@ class User(Resource):
         cur.execute(query)
         # result = cur.fetchone()
         # pprint(result)
+
         row = dict(zip(self.resource_cols, cur.fetchone()))
         return row
         # user_data = cur.fetchone()

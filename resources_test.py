@@ -39,6 +39,7 @@ class TestCreateUser(unittest.TestCase):
 class TestUser(unittest.TestCase):
     def setUp(self):
         self.users = {"electric_wizard": User(), "dopethrone": User()}
+        [User.clear(username) for username in self.users.keys()]
         for username, user in self.users.items():
             user.create({"username": username})
 
@@ -50,8 +51,24 @@ class TestUser(unittest.TestCase):
         for user in self.users.values():
             user.delete()
 
+class TestGame(unittest.TestCase):
+    def setUp(self):
+        self.users = {"electric_wizard": User(), "dopethrone": User()}
+        [User.clear(username) for username in self.users.keys()]
+        # for username in self.users.keys():
+            # User.clear(username)
+        for username, user in self.users.items():
+            user.create({"username": username})
+        self.game = Game()
 
+    def test_join_game(self):
+        # users = self.users.values()
+        [user.join(self.game) for user in self.users.values()]
+        self.assertEqual(self.users.values(), self.game.participants)
 
+    def tearDown(self):
+        self.game.delete()
+        [user.delete() for user in self.users.values()]
 
 if __name__ == '__main__':
     unittest.main()
