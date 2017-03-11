@@ -251,10 +251,11 @@ class Game(Resource):
         participants = self.participants # cache db call temporarily
         if len(participants) < 2:
             return # do nothing
-        colors = [0, 1]
-        shuffle(colors)
-        for i in range(2):
-            participants[i].color = colors[i]
+        if participants[0].color == -1:
+            colors = [0, 1]
+            shuffle(colors)
+            for i in range(2):
+                participants[i].color = colors[i]
         self.game_status = 1
 
 
