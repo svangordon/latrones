@@ -113,8 +113,6 @@ class User(Resource):
     resource_cols = ("user_id", "username")
     def __init__(self, user_identifier=None):
         """ they identifier is either the username or userstring """
-        # self.resource_id = user_id
-        # pprint(user_identifier)
         self._resource_id = None
         self._username = None
         if user_identifier:
@@ -240,12 +238,7 @@ class Game(Resource):
         query = self.queries["get_participants"].substitute(resource_id=self.resource_id)
         cur.execute(query)
         rows = cur.fetchall()
-        pprint(rows)
-        # for row in results:
-            # participants[row[3]] = Participant(row)
-        # participants = [Participant(row) for row in cur.fetchall()]
         cur.close()
-        # print('===',[participant for participant in participants], '===')
         return [Participant(row) for row in rows]
 
     @property
