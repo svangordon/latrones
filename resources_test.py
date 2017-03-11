@@ -82,10 +82,9 @@ class TestGame(unittest.TestCase):
         [user.join(game) for user in self.users.values()]
         self.assertEqual(len(game.participants), 2)
         self.assertEqual(game.game_status, 1)
-        # game.delete()
+        game.delete()
 
     def tearDown(self):
-        # self.game.delete()
         [user.delete() for user in self.users.values()]
 
 if __name__ == '__main__':
