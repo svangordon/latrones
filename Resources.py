@@ -92,6 +92,8 @@ class User(Resource):
         """ they identifier is either the username or userstring """
         # self.resource_id = user_id
         # pprint(user_identifier)
+        self._resource_id = None
+        self._username = None
         if user_identifier:
             user = self.read(user_identifier)
             self._resource_id = user["user_id"]
@@ -99,7 +101,7 @@ class User(Resource):
 
     def read(self, identifier=None):
         if identifier is None:
-            identifier = self.user_id
+            identifier = self.resource_id
         cur = cnx.cursor()
         try:
             query = self.queries["get_by_id"].substitute(identifier=int(identifier))
@@ -121,11 +123,22 @@ class User(Resource):
             return self._resource_id
         elif self._username:
             self._resource_id = self.read(self._username)["user_id"]
+            return self._resource_id
         else:
             raise ValueError("trying to read resource_id of empty User")
     @resource_id.setter
     def resource_id(self, value):
         self._resource_id = value
+
+    @property
+    def username(self):
+        if self._username:
+            return self._username
+        elif self._resource_id:
+            self._username = self.read(self._username)["username"]
+            return self._username
+        else:
+            raise ValueError("trying to read resource_id of empty User")
 
     @property
     def profile(self):
@@ -144,21 +157,6 @@ class User(Resource):
         rows = cur.fetchall()
         cur.close()
         return [Game(row) for row in rows]
-
-    @property
-    def username(self):
-        """ Probably, I should be caching this """
-        if self._username:
-            return self._username
-        if self._resource_id is None:
-            return None
-        cur = cnx.cursor()
-        query = self.queries["get_username"].substitute(resource_id=self.resource_id)
-        cur.execute(query)
-        username = cur.fetchone()[0]
-        cur.close()
-        self._username = username
-        return username
 
 class Game(Resource):
     queries = {
