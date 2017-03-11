@@ -232,6 +232,10 @@ class Game(Resource):
         return moves
 
     @property
+    def fen(self):
+        return self.moves[-1]["fen"]
+
+    @property
     def participants(self):
         # participants = [None]*2
         cur = cnx.cursor()
