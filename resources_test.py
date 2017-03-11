@@ -65,6 +65,8 @@ class TestGame(unittest.TestCase):
         # users = self.users.values()
         [user.join(self.game) for user in self.users.values()]
         self.assertEqual([user.resource_id for user in self.users.values()].sort(), [participant.user_id for participant in self.game.participants].sort())
+        [user.leave(self.game) for user in self.users.values()]
+        self.assertEqual(self.game.participants, [])
 
     def tearDown(self):
         self.game.delete()

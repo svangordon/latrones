@@ -107,7 +107,8 @@ class User(Resource):
 	ON (game.game_id = participant.game_id AND participant.user_id = $user_id AND (game.game_status = 0 OR game.game_status = 1));"""),
     "get_by_id": Template("""SELECT * FROM user WHERE user_id = $identifier;"""),
     "get_by_username": Template("""SELECT * FROM user WHERE username = "$identifier";"""),
-    "join": Template("""INSERT INTO participant (user_id, game_id, color) VALUES ($user_id, $game_id, $color)""")
+    "join": Template("""INSERT INTO participant (user_id, game_id, color) VALUES ($user_id, $game_id, $color)"""),
+    "leave": Template("""DELETE FROM participant WHERE game_id = $game_id AND user_id = $user_id""")
     }
     resource_cols = ("user_id", "username")
     def __init__(self, user_identifier=None):
@@ -136,17 +137,10 @@ class User(Resource):
         try:
             query = self.queries["get_by_id"].substitute(identifier=int(identifier))
         except ValueError:
-            # identifier == str
             query = self.queries["get_by_username"].substitute(identifier=identifier)
         cur.execute(query)
-        # result = cur.fetchone()
-        # pprint(result)
-
         row = dict(zip(self.resource_cols, cur.fetchone()))
         return row
-        # user_data = cur.fetchone()
-        # self.user_id = user_data[0]
-        # self.username = user_data[1]
 
     def join(self, game, color=-1):
         try:
@@ -160,10 +154,16 @@ class User(Resource):
         cnx.commit()
         cur.execute("""SELECT LAST_INSERT_ID();""")
         row = cur.fetchone()
-        # pprint(row)
-        # game.add_participant(row)
         cur.close()
         game.start() #NB: start does nothing if there's not two participants
+
+    def leave(self, game):
+        cur = cnx.cursor()
+        values = {"user_id": self.resource_id, "game_id": game.resource_id}
+        query = self.queries["leave"].substitute(values)
+        cur.execute(query)
+        cnx.commit()
+        cur.close()
 
     @property
     def resource_id(self):
