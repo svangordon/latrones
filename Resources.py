@@ -82,19 +82,20 @@ class User(Resource):
     queries = {
     "create": Template("""INSERT INTO user (username) VALUES ("$username");"""),
     "get_active_games": Template("""SELECT game.game_id, start_time, initial_fen, game_status FROM game LEFT JOIN (participant)
-	ON (game.game_id = participant.game_id AND participant.user_id = $user_id AND (game.game_status = 0 OR game.game_status = 1)) """)
-    "delete": Template("""DELETE FROM user WHERE user_id = $resource_id"""),
-    "get__by_username": Template("""SELECT * FROM user WHERE username = $identifier"""),
-    "get_by_id": Template("""SELECT * FROM user WHERE user_id = $identifier""")
+	ON (game.game_id = participant.game_id AND participant.user_id = $user_id AND (game.game_status = 0 OR game.game_status = 1));"""),
+    "delete": Template("""DELETE FROM user WHERE user_id = $resource_id;"""),
+    "get_by_username": Template("""SELECT * FROM user WHERE username = "$identifier";"""),
+    "get_by_id": Template("""SELECT * FROM user WHERE user_id = $identifier;""")
     }
     resource_cols = ("user_id", "username")
     def __init__(self, user_identifier=None):
         """ they identifier is either the username or userstring """
         # self.resource_id = user_id
+        # pprint(user_identifier)
         if user_identifier:
             user = self.read(user_identifier)
-            self.resource_id = user["user_id"]
-            self.username = user["username"]
+            self._resource_id = user["user_id"]
+            self._username = user["username"]
 
     def read(self, identifier=None):
         if identifier is None:
@@ -106,11 +107,25 @@ class User(Resource):
             # identifier == str
             query = self.queries["get_by_username"].substitute(identifier=identifier)
         cur.execute(query)
+        # result = cur.fetchone()
+        # pprint(result)
         row = dict(zip(self.resource_cols, cur.fetchone()))
         return row
         # user_data = cur.fetchone()
         # self.user_id = user_data[0]
         # self.username = user_data[1]
+
+    @property
+    def resource_id(self):
+        if self._resource_id:
+            return self._resource_id
+        elif self._username:
+            self._resource_id = self.read(self._username)["user_id"]
+        else:
+            raise ValueError("trying to read resource_id of empty User")
+    @resource_id.setter
+    def resource_id(self, value):
+        self._resource_id = value
 
     @property
     def profile(self):
@@ -133,11 +148,16 @@ class User(Resource):
     @property
     def username(self):
         """ Probably, I should be caching this """
+        if self._username:
+            return self._username
+        if self._resource_id is None:
+            return None
         cur = cnx.cursor()
         query = self.queries["get_username"].substitute(resource_id=self.resource_id)
         cur.execute(query)
         username = cur.fetchone()[0]
         cur.close()
+        self._username = username
         return username
 
 class Game(Resource):
