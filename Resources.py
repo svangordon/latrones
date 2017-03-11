@@ -193,19 +193,19 @@ class Game(Resource):
         cur.close()
         return moves
 
-    def join(self, user_id, color=-1):
+    def join(self, user, color=-1):
         cur = cnx.cursor()
-        values = {"user_id": user_id, "game_id": self.resource_id, "color": color}
+        values = {"user_id": user.resource_id, "game_id": self.resource_id, "color": color}
         query = self.queries["join"].substitute(values)
         # raise ValueError(query)
         cur.execute(query)
         cur.close()
 
-    def make_move(self, user_id, move):
+    def make_move(self, user, move):
         cur = cnx.cursor()
-        participant_id = [participant for participant in self.participants if participant["user_id"] == user_id][0]["participant_id"]
+        participant_id = [participant for participant in self.participants if participant["user_id"] == user.resource_id][0]["participant_id"]
         # Need some kind of more thorough veting to make sure the right user is making moves?
-        color = [participant["color"] for participant in self.participants if participant["user_id"] == user_id][0]
+        color = [participant["color"] for participant in self.participants if participant["user_id"] == user.resource_id][0]
         try:
             game_state = GameState(self.moves[-1]["fen"])
         except IndexError:
