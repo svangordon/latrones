@@ -72,7 +72,7 @@ class Participant(Resource):
     @color.setter
     def color(self, color):
         cur = cnx.cursor()
-        values = {"participant_id": self.resource_id, "color": color}
+        values = {"resource_id": self.resource_id, "color": color}
         query = self.queries["set_color"].substitute(values)
         cur.execute(query)
         cnx.commit()
@@ -208,7 +208,7 @@ class Game(Resource):
     "get_participants": Template("""SELECT * FROM participant WHERE game_id = $resource_id"""),
     "join": Template("""INSERT INTO participant (user_id, game_id, color) VALUES ($user_id, $game_id, $color)"""),
     "make_move": Template("""INSERT INTO move (game_id, participant_id, fen, half_move_clock, notation) VALUES ($game_id, $participant_id, "$fen", $half_move_clock, "$notation")"""),
-    "update_game_status": Template("""UPDATE participant SET game_status = $game_status WHERE game_id = $resource_id""")
+    "update_game_status": Template("""UPDATE game SET game_status = $game_status WHERE game_id = $resource_id""")
     }
     default_options = {"initial_fen": "oooooooooooo/c/c/c/c/c/c/OOOOOOOOOOOO,0,0,0 12,8,12,d,-4,T o/0111/2111/2/f"}
     move_cols = ("move_id", "game_id", "participant_id", "fen", "half_move_clock", "notation")
@@ -237,7 +237,7 @@ class Game(Resource):
     def game_status(self):
         return self.read()["game_status"]
     @game_status.setter
-    def game_status(self):
+    def game_status(self, game_status):
         cur = cnx.cursor()
         query = self.queries["update_game_status"].substitute(resource_id=self.resource_id, game_status=game_status)
         cur.execute(query)
