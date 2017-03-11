@@ -226,12 +226,15 @@ class Game(Resource):
 
     @property
     def participants(self):
+        participants = [None]*2
         cur = cnx.cursor()
         query = self.queries["get_participants"].substitute(resource_id=self.resource_id)
         cur.execute(query)
-        participants = [Participant(row) for row in cur.fetchall()]
+        for row in cur.fetchall():
+            output[row[3]] = Participant(row)
+        # participants = [Participant(row) for row in cur.fetchall()]
         cur.close()
-        return participants
+        return [participant for participant in participants if participant is not None]
 
     @property
     def game_status(self):

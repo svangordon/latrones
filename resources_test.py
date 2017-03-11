@@ -36,27 +36,20 @@ class TestCreateUser(unittest.TestCase):
         user = User(self.username1)
         user.delete()
 
-class TestFlow(unittest.TestCase):
+class TestUser(unittest.TestCase):
     def setUp(self):
         self.users = {"electric_wizard": User(), "dopethrone": User()}
-        # self.users = [User(), User()]
         for username, user in self.users.items():
             user.create({"username": username})
 
     def test_create_user(self):
-        game = Game()
-        self.game = game
-        i = 1
-        for user in self.users.values():
-            user.join(game)
-            self.assertEqual(len(game.participants), i)
-            i += 1
-        self.assertEqual(game.game_status, 1)
+        for username, user in self.users.items():
+            self.assertEqual(user.username, username)
 
     def tearDown(self):
         for user in self.users.values():
             user.delete()
-        self.game.delete()
+
 
 
 
