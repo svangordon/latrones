@@ -6,6 +6,7 @@ import MySQLdb
 from db import cnx
 # cnx = MySQLdb.connect(host="localhost", user="igoinu", passwd="password", db="latr")
 from pprint import pprint
+from random import shuffle
 
 
 class Resource:
@@ -148,8 +149,10 @@ class User(Resource):
         query = self.queries["join"].substitute(values)
         cur.execute(query)
         cnx.commit()
-        cur.execute("SELECT * FROM LAST_INSERT_ID();")
-        game.add_participant(cur.fetchone())
+        cur.execute("""SELECT LAST_INSERT_ID();""")
+        row = cur.fetchone()
+        # pprint(row)
+        # game.add_participant(row)
         cur.close()
         game.start() #NB: start does nothing if there's not two participants
 

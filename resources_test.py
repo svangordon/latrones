@@ -43,10 +43,13 @@ class TestFlow(unittest.TestCase):
         for username, user in self.users.items():
             user.create({"username": username})
 
-    # def test_create_user(self):
-    #     game = Game()
-    #     user1.join(game)
-    #     self.assertEqual(len(game.participants), 1)
+    def test_create_user(self):
+        game = Game()
+        i = 1
+        for user in self.users.values():
+            user.join(game)
+            self.assertEqual(len(game.participants), i)
+            i += 1
 
     def tearDown(self):
         for user in self.users.values():
