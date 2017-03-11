@@ -59,11 +59,15 @@ class Participant(Resource):
         "set_color": Template("""UPDATE participant SET color = $color WHERE participant_id = $resource_id""")
     }
     resource_cols = ("participant_id", "user_id", "game_id", "color")
-    def __init__(self, participant_id=None):
-        self.resource_id = participant_id
+    def __init__(self, row):
+        attr = dict(zip(self.resource_cols, row))
+        self.resource_id = attr["participant_id"]
+        self.user_id = attr["user_id"]
+        self.game_id = attr["game_id"]
+        self._color = attr["color"]
     @property
     def color(self):
-        return self.read()["color"]
+        return self._color
     @color.setter
     def color(self, color):
         cur = cnx.cursor()
@@ -72,6 +76,7 @@ class Participant(Resource):
         cur.execute(query)
         cnx.commit()
         cur.close()
+        self._color = color
 
     def join(self, game_id, color=-1):
         cur = cnx.cursor()
@@ -219,9 +224,9 @@ class Game(Resource):
         cur = cnx.cursor()
         query = self.queries["get_participants"].substitute(resource_id=self.resource_id)
         cur.execute(query)
-        moves = [dict(zip(self.user_cols, row)) for row in cur.fetchall()]
+        participants = [Participant(row) for row in cur.fetchall()]
         cur.close()
-        return moves
+        return participants
 
     def start(self):
         if len(participants) == 2:
