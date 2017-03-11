@@ -30,7 +30,7 @@ class TestCreateUser(unittest.TestCase):
     def test_create_user(self):
         user = User()
         user.create({"username": "electric_wizard"})
-        self.assertFalse(user)
+        self.assertEqual(user.username, self.username1)
 
     def tearDown(self):
         user = User(self.username1)
