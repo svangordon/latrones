@@ -21,7 +21,7 @@ from db import cnx
 @hug.post('/user')
 def create_user(username):
     """ create a new user """
-    print('username ==', username)
+    username = username.lower()
     user = User()
     user.create({"username":username})
     return user.read()
