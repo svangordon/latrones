@@ -279,9 +279,9 @@ class Game(Resource):
 
     def make_move(self, user, move):
         cur = cnx.cursor()
-        participant_id = [participant for participant in self.participants if participant["user_id"] == user.resource_id][0]["participant_id"]
+        participant_id = [participant for participant in self.participants if participant.user_id == user.resource_id][0].resource_id
         # Need some kind of more thorough veting to make sure the right user is making moves?
-        color = [participant["color"] for participant in self.participants if participant["user_id"] == user.resource_id][0]
+        color = [participant.color for participant in self.participants if participant.user_id == user.resource_id][0]
         try:
             game_state = GameState(self.moves[-1]["fen"])
         except IndexError:

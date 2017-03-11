@@ -56,8 +56,6 @@ class TestGame(unittest.TestCase):
     def setUp(self):
         self.users = {"electric_wizard": User(), "dopethrone": User()}
         [User.clear(username) for username in self.users.keys()]
-        # for username in self.users.keys():
-            # User.clear(username)
         for username, user in self.users.items():
             user.create({"username": username})
 
@@ -70,7 +68,6 @@ class TestGame(unittest.TestCase):
         [user.leave(game) for user in self.users.values()]
         # self.assertEqual(game.participants, [])
         game.delete()
-
     def test_leave_game(self):
         game = Game()
         [user.join(game) for user in self.users.values()]
@@ -83,6 +80,16 @@ class TestGame(unittest.TestCase):
         self.assertEqual(len(game.participants), 2)
         self.assertEqual(game.game_status, 1)
         game.delete()
+    def test_make_move(self):
+        game = Game()
+        [user.join(game) for user in self.users.values()]
+        for participant in game.participants:
+            if participant.color == 0:
+                game.make_move(User(participant.user_id), "a1 a2")
+        for participant in game.participants:
+            if participant.color == 1:
+                game.make_move(User(participant.user_id), "k8 k7")
+        self.assertEqual(game.fen, "1ooooooooooo/ob/c/c/c/c/aO1/OOOOOOOOOO1O,0,2,1 12,8,12,d,-4,T o/0111/2111/2/f")
 
     def tearDown(self):
         [user.delete() for user in self.users.values()]
