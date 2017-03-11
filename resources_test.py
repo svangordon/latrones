@@ -45,16 +45,18 @@ class TestFlow(unittest.TestCase):
 
     def test_create_user(self):
         game = Game()
+        self.game = game
         i = 1
         for user in self.users.values():
             user.join(game)
             self.assertEqual(len(game.participants), i)
             i += 1
+        self.assertEqual(game.game_status, 1)
 
     def tearDown(self):
         for user in self.users.values():
             user.delete()
-
+        self.game.delete()
 
 
 

@@ -213,7 +213,7 @@ class Game(Resource):
     default_options = {"initial_fen": "oooooooooooo/c/c/c/c/c/c/OOOOOOOOOOOO,0,0,0 12,8,12,d,-4,T o/0111/2111/2/f"}
     move_cols = ("move_id", "game_id", "participant_id", "fen", "half_move_clock", "notation")
     participant_cols = ("participant_id", "user_id", "game_id", "color")
-    resource_cols = ("game_id", "start_time", "initial_fen")
+    resource_cols = ("game_id", "start_time", "initial_fen", "game_status")
 
     @property
     def moves(self):
