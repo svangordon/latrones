@@ -1,6 +1,7 @@
 
 import MySQLdb
-import hug
+from flask import Flask
+app = Flask(__name__)
 
 import constants
 from constants import sql_templates
@@ -19,7 +20,7 @@ from db import cnx
 # PUT /game/{game_id}?<move> Make a move. Maybe hold body in req body?
 # POST /game/{user_id} Create and join a new game
 
-@hug.post('/user')
+@app.route('/user')
 def create_user(username):
     """ create a new user """
     username = username.lower()
@@ -27,23 +28,26 @@ def create_user(username):
     user.create({"username":username})
     return user.read()
 
-@hug.get('/user')
-@hug.get('/user/{iden}')
-def get_user(iden):
-    return User(iden).read()
+# @hug.get('/user')
+# @hug.get('/user/{iden}')
+# def get_user(iden):
+#     return User(iden).read()
+#
+# @hug.get('/game/{game_id}')
+# def get_game(game_id):
+#     game = Game(game_id)
+#     return game.read()
+#
+# @hug.post('/game/{user_id}')
+# def create_game(user_id):
+#     game = Game()
+#     user = User(user_id)
+#     user.join(game)
+#     return game.read()
+#
+# @hug.post('/home')
+# def post_method():
+#     return "you used a post method!"
 
-@hug.get('/game/{game_id}')
-def get_game(game_id):
-    game = Game(game_id)
-    return game.read()
-
-@hug.post('/game/{user_id}')
-def create_game(user_id):
-    game = Game()
-    user = User(user_id)
-    user.join(game)
-    return game.read()
-
-@hug.post('/home')
-def post_method():
-    return "you used a post method!"
+if __name__ == "__main__":
+    app.run()
