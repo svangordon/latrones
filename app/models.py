@@ -52,7 +52,7 @@ class CaptureMethod(db.Model):
 class Move(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # participant_id = db.Column(db.Integer, db.ForeignKey('participant.id')) # we can figure this out from the game_piece
-    piece_id = db.Column(db.Integer, db.ForeignKey)
+    piece_id = db.Column(db.Integer, db.ForeignKey('game_piece.id'))
     origin = db.Column(db.Integer)
     destination = db.Column(db.Integer)
     fen = db.Column(db.String(64))
