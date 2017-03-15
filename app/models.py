@@ -65,6 +65,13 @@ class Move(db.Model):
     notation = db.Column(db.String(16))
     half_move = db.Column(db.Integer)
 
+class Piece(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(16))
+    move_pattern = db.Column(db.String(4))
+    jump_pattern = db.Column(db.String(4))
+    fen_char = db.Column(db.String(1))
+
 class GamePiece(db.Model):
     __tablename__ = 'game_piece'
     id = db.Column(db.Integer, primary_key=True)
