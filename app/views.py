@@ -6,6 +6,14 @@ from flask_restful import Resource, Api, reqparse
 from flask_httpauth import HTTPBasicAuth
 
 api = Api(app)
+auth = HTTPBasicAuth()
+
+@auth.get_password
+def get_pw(nickname):
+    u = User.query.filter_by(nickname=nickname)
+    if u:
+        return u.password
+    return None
 
 class UserListAPI(Resource):
     """ Responsible for creating new users and, I guess, getting a list of all users """
