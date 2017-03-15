@@ -54,7 +54,7 @@ class GameRule(db.Model):
     width = db.Column(db.Integer)
     height = db.Column(db.Integer)
     capture_method_id = db.Column(db.Integer, db.ForeignKey('capture_method.id'))
-    capture_method = db.relationship('CaptureMethod', lazy='dynamic')
+    # capture_method = db.relationship('CaptureMethod', lazy='dynamic')
 
     def __repr__(self):
         return '<GameRule %r by %r %r>' % (self.width, self.height, self.capture_method_id)
