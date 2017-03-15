@@ -1,0 +1,62 @@
+API Route:
+
+User Methods
+1A
+POST /user/create
+create_user
+
+1B
+PUT /user/<user_id>
+update_user
+
+1C
+DELETE /user/<user_id>
+delete_user
+
+1D
+GET /user/<user_id>
+get_user
+Get user profile
+
+login methods:
+2A POST /login
+returns: user account obj
+2B POST /logout
+
+Game Methods
+
+3A
+GET /game/<game_id>
+poll_game
+returns game object
+
+3B
+POST /game/join
+create_game
+params: user_id, game_rules, matchmaking prefs
+Joins the matchmaking queue. Looks for a match; if it finds one, returns the match of the game.
+If it doesn't find one, it creates one, and returns the id of that game.
+
+3C
+PUT /game/<game_id>
+make_move
+params: user_id, notation
+make a move on a game
+
+3D
+DELETE /game/<game_id>?user_id=<user_id>
+leave_game
+params: game_id, user_id
+
+Flow:
+
+User1:
+-- Create account (1A) POST /user/create
+-- Login (2A) P
+-- Join queue (3B) (get id of empty game)
+-- Begin polling (but that's client side so we don't see it)
+
+User2:
+-- Create account (1A)
+-- Login (2A)
+-- Join queue (3B)

@@ -5,6 +5,7 @@ import unittest
 from config import basedir
 from app import app, db
 from app.models import User
+import fake_data
 
 class TestCase(unittest.TestCase):
     def setUp(self):

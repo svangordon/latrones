@@ -1,8 +1,58 @@
-from flask import render_template, flash, redirect, request
+from flask import render_template, flash, redirect, request, jsonify
 from app import app, db
 from .forms import LoginForm
 from .models import User
+from flask_restful import Resource, Api
+from flask_restful import reqparse
 
+api = Api(app)
+
+class UserListAPI(Resource):
+    """ Responsible for creating new users and, I guess, getting a list of all users """
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('nickname', type=str, required=True, location='json')
+        self.reqparse.add_argument('email', type=str, required=True, location='json')
+        super(UserListAPI, self).__init__()
+
+    def get(self):
+        users = User.query.all()
+        return jsonify([{"id":u.id, "nickname":u.nickname, "email":u.email} for u in users])
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        user = User(**args)
+        print('===')
+        print(user)
+        db.session.add(user)
+        db.session.commit()
+        respo = User.query.filter(User.nickname == args["nickname"])
+        print(respo)
+        return 'user added'
+
+api.add_resource(UserListAPI, '/latr/api/v1.0/users', endpoint='users')
+
+
+class UserAPI(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('user_id', type=int, required=True)
+        self.reqparse.add_argument('email', type=str, location='json')
+        self.reqparse.add_argument('nickname', type=str, location='json')
+        super(UserAPI, self).__init__()
+
+    def get(self, user_id):
+        u = User.query.get(user_id)
+        print(u)
+        return jsonify({'id': u.id, 'nickname': u.nickname, 'email': u.email})
+
+    def put(self, user_id):
+        pass
+
+    def delete(self, user_id):
+        pass
+
+api.add_resource(UserAPI, '/latr/api/v1.0/user/<user_id>', endpoint='user')
 
 @app.route('/')
 @app.route('/index')
@@ -36,8 +86,17 @@ def login():
                            form=form,
                            providers=app.config['OPENID_PROVIDERS'])
 
-@app.route('/user', methods=['GET', 'POST'])
-def user():
-    user = User.query.filter_by(nickname='john').first()
-    print(user)
-    return 'user'
+# @app.route('/user', methods=['GET', 'POST'])
+# def user(user_id=None):
+#     # user = User.query.filter_by(nickname='john').first()
+#     # print(user)
+#     return 'does this work?'
+#
+# @app.route('/user', methods=['POST'])
+# @app.route('/user/<user_id>', methods=['GET', 'POST'])
+# def user(user_id=None):
+#     user = User.query.filter_by(nickname='john').first()
+#     print(user)
+#     return 'user_id = {0}'.format(user_id)
+#
+# @app.route('/game')
