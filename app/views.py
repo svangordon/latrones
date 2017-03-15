@@ -36,7 +36,7 @@ api.add_resource(UserListAPI, '/latr/api/v1.0/users', endpoint='users')
 class UserAPI(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('user_id', type=int, required=True)
+        # self.reqparse.add_argument('user_id', type=int, required=True)
         self.reqparse.add_argument('email', type=str, location='json')
         self.reqparse.add_argument('nickname', type=str, location='json')
         super(UserAPI, self).__init__()
@@ -50,7 +50,11 @@ class UserAPI(Resource):
         pass
 
     def delete(self, user_id):
-        pass
+        args = self.reqparse.parse_args()
+        user = User.query.get(user_id)
+        db.session.delete(user)
+        db.session.commit()
+        return 'user deleted'
 
 api.add_resource(UserAPI, '/latr/api/v1.0/user/<user_id>', endpoint='user')
 
