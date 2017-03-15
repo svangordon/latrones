@@ -47,7 +47,15 @@ class UserAPI(Resource):
         return jsonify({'id': u.id, 'nickname': u.nickname, 'email': u.email})
 
     def put(self, user_id):
-        pass
+        args = self.reqparse.parse_args()
+        print('===', app.config['DEBUG'], '===')
+        if not app.config['DEBUG']:
+            raise NotImplementedError("validate that user is modifying own record")
+        u = User.query.get(user_id)
+        u.nickname = args['nickname']
+        u.email = args['email']
+        db.session.commit()
+        return jsonify({'id': u.id, 'nickname': u.nickname, 'email': u.email})
 
     def delete(self, user_id):
         args = self.reqparse.parse_args()
