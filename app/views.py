@@ -2,8 +2,8 @@ from flask import render_template, flash, redirect, request, jsonify
 from app import app, db
 from .forms import LoginForm
 from .models import User
-from flask_restful import Resource, Api
-from flask_restful import reqparse
+from flask_restful import Resource, Api, reqparse
+from flask_httpauth import HTTPBasicAuth
 
 api = Api(app)
 
@@ -30,7 +30,6 @@ class UserListAPI(Resource):
         print(respo)
         return 'user added'
 
-api.add_resource(UserListAPI, '/latr/api/v1.0/users', endpoint='users')
 
 
 class UserAPI(Resource):
@@ -64,6 +63,7 @@ class UserAPI(Resource):
         db.session.commit()
         return 'user deleted'
 
+api.add_resource(UserListAPI, '/latr/api/v1.0/users', endpoint='users')
 api.add_resource(UserAPI, '/latr/api/v1.0/user/<user_id>', endpoint='user')
 
 @app.route('/')
