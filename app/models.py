@@ -11,7 +11,6 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % (self.nickname)
 
-
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.String(140))
@@ -25,11 +24,18 @@ class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     status_id = db.Column(db.Integer, db.ForeignKey('game_status.id'))
     start_time = db.Column(db.DateTime)
+    players = db.relationship('Participant', lazy='dynamic')
+
+    def __repr__(self):
+        return '<Game %r>' % (self.id)
 
 class GameStatus(db.Model):
     __tablename__ = 'game_status'
     id = db.Column(db.Integer, primary_key=True)
     desc = db.Column(db.String(32), index=True)
+
+    def __repr__(self):
+        return '<GameStatus %r>' % (self.desc)
 
 class Participant(db.Model):
     id = db.Column(db.Integer, primary_key=True)
