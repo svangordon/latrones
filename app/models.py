@@ -44,16 +44,28 @@ class Participant(db.Model):
     playing = db.Column(db.Boolean)
     color = db.Column(db.Integer)
 
+    def __repr__(self):
+        return '<Participant %r Game: %r User: %r' % (self.user_id, self.game_id, self.user.nickname)
+
 class GameRule(db.Model):
+    """ holds the rules for an individual game """
+    __tablename__ = 'game_rule'
     id = db.Column(db.Integer, primary_key=True)
-    height = db.Column(db.Integer)
     width = db.Column(db.Integer)
-    capture_method = db.Column(db.Integer, db.ForeignKey('capture_method.id'))
+    height = db.Column(db.Integer)
+    capture_method_id = db.Column(db.Integer, db.ForeignKey('capture_method.id'))
+    capture_method = db.relationship('CaptureMethod', lazy='dynamic')
+
+    def __repr__(self):
+        return '<GameRule %r by %r %r>' % (self.width, self.height, self.capture_method_id)
 
 class CaptureMethod(db.Model):
     __tablename__ = 'capture_method'
     id = db.Column(db.Integer, primary_key=True)
     desc = db.Column(db.String(16))
+
+    def __repr__(self):
+        return '<CaptureMethod %r %r>' % (self.id, self.desc)
 
 class Move(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -64,6 +76,9 @@ class Move(db.Model):
     fen = db.Column(db.String(64))
     notation = db.Column(db.String(16))
     half_move = db.Column(db.Integer)
+
+    def __repr__(self):
+        return '<Move %r %r %r>' % (self.half_move, self.origin, self.destination)
 
 class Piece(db.Model):
     id = db.Column(db.Integer, primary_key=True)
