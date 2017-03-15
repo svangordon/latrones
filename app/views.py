@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, request, jsonify
+from flask import render_template, flash, redirect, request, jsonify, g
 from app import app, db
 from .forms import LoginForm
 from .models import User
@@ -8,12 +8,20 @@ from flask_httpauth import HTTPBasicAuth
 api = Api(app)
 auth = HTTPBasicAuth()
 
-@auth.get_password
-def get_pw(nickname):
-    u = User.query.filter_by(nickname=nickname)
-    if u:
-        return u.password
-    return None
+# @auth.get_password
+# def get_pw(nickname):
+#     u = User.query.filter_by(nickname=nickname)
+#     if u:
+#         print(u)
+#         return u.password
+#     return None
+@auth.verify_password
+def verify_password(nickname, password):
+    user = User.query.filter_by(nickname = nickname).first()
+    if not user or not user.verify_password(password):
+        return False
+    g.user = user
+    return True
 
 class UserListAPI(Resource):
     """ Responsible for creating new users and, I guess, getting a list of all users """
@@ -21,6 +29,7 @@ class UserListAPI(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('nickname', type=str, required=True, location='json')
         self.reqparse.add_argument('email', type=str, required=True, location='json')
+        self.reqparse.add_argument('password', type=str, required=True, location='json')
         super(UserListAPI, self).__init__()
 
     def get(self):
@@ -28,10 +37,13 @@ class UserListAPI(Resource):
         return jsonify([{"id":u.id, "nickname":u.nickname, "email":u.email} for u in users])
 
     def post(self):
+        """ Create user """
         args = self.reqparse.parse_args()
-        user = User(**args)
-        print('===')
-        print(user)
+        if User.query.filter_by(nickname=args["nickname"]).first() is not None:
+            # print(User.query.filter_by(nickname=args["nickname"]))
+            return 400
+        user = User(nickname=args["nickname"], email=args["email"])
+        user.hash_password(args["password"])
         db.session.add(user)
         db.session.commit()
         respo = User.query.filter(User.nickname == args["nickname"])
@@ -76,6 +88,7 @@ api.add_resource(UserAPI, '/latr/api/v1.0/user/<user_id>', endpoint='user')
 
 @app.route('/')
 @app.route('/index')
+@auth.login_required
 def index():
     user = {'nickname': 'Miguel'}
     posts = [

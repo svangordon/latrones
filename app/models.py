@@ -5,7 +5,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nickname = db.Column(db.String(64), index=True, nullable=False, unique=True)
     email = db.Column(db.String(120), index=True, nullable=False, unique=True)
-    password = db.Column(db.String(128), index=True)
+    password_hash = db.Column(db.String(128), index=True)
     social_id = db.Column(db.String(64), nullable=True)
     # posts = db.relationship('Post', backref='author', lazy='dynamic')
     games = db.relationship('Participant', backref='user', lazy='dynamic')
@@ -15,7 +15,7 @@ class User(db.Model):
         self.password_hash = pwd_context.encrypt(password)
 
     def verify_password(self, password):
-        return pwd_context.verif(password, self.password_hash)
+        return pwd_context.verify(password, self.password_hash)
 
     def __repr__(self):
         return '<User %r>' % (self.nickname)
