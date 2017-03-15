@@ -1,6 +1,7 @@
-from flask import render_template, flash, redirect
-from app import app
+from flask import render_template, flash, redirect, request
+from app import app, db
 from .forms import LoginForm
+from .models import User
 
 
 @app.route('/')
@@ -34,3 +35,9 @@ def login():
                            title='Sign In',
                            form=form,
                            providers=app.config['OPENID_PROVIDERS'])
+
+@app.route('/user', methods=['GET', 'POST'])
+def user():
+    user = User.query.filter_by(nickname='john').first()
+    print(user)
+    return 'user'
