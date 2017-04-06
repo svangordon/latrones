@@ -8,7 +8,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(128), index=True)
     social_id = db.Column(db.String(64), nullable=True)
     # posts = db.relationship('Post', backref='author', lazy='dynamic')
-    games = db.relationship('Participant', backref='user', lazy='dynamic')
+    participation = db.relationship('Participant', back_populates='user', lazy='dynamic')
     rating = db.Column(db.Integer)
 
     def hash_password(self, password):
@@ -53,7 +53,7 @@ class Participant(db.Model):
     playing = db.Column(db.Boolean)
     color = db.Column(db.Integer)
     game = db.relationship("Game", back_populates="players")
-    # user = relationship("User", back_populates="")
+    user = db.relationship("User", back_populates="participation")
 
     def __repr__(self):
         return '<Participant %r Game: %r User: %r' % (self.user_id, self.game_id, self.user.nickname)
