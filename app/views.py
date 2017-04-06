@@ -96,8 +96,15 @@ class GameListAPI(Resource):
 
     def get(self):
         games = Game.query.all()
-        print(games)
-        return jsonify([{"game_id":g.id, "start_time":g.start_time, "status_id":g.status_id} for g in games])
+        # print('players',games[0].players.all())
+        participants = Participant.query.all()
+        print(participants)
+        return jsonify([{
+            "game_id": g.id,
+            "start_time": g.start_time,
+            "status_id": g.status_id,
+            "players": [{"participant_id": p.id} for p in g.players.all()]
+        } for g in games])
 
     def post(self, user_id=None):
         # self.reqparse = reqparse.RequestParser()
@@ -107,13 +114,13 @@ class GameListAPI(Resource):
         user_id = request.args.get('user_id')
         game = Game()
         game.status_id = 0
-        foo = db.session.add(game)
-        print('foo', foo)
-        db.session.commit()
+        addResult = db.session.add(game)
+        commitResult = db.session.commit()
+        # print(game, game.id, addResult, commitResult)
 
         participant = Participant()
         participant.user_id = user_id
-        participant.game_id = foo
+        participant.game_id = game.id
         participant.color = -1
         db.session.add(participant)
         db.session.commit()
@@ -126,6 +133,8 @@ api.add_resource(GameListAPI, '/latr/api/v1.0/games', endpoint='games')
 api.add_resource(UserListAPI, '/latr/api/v1.0/users', endpoint='users')
 api.add_resource(UserAPI, '/latr/api/v1.0/user/<user_id>', endpoint='user')
 
+
+# These are the 'non-api' routes. Ignore them. except for reference as needed
 @app.route('/')
 @app.route('/index')
 # @auth.login_required
