@@ -98,7 +98,7 @@ class GameListAPI(Resource):
         games = Game.query.all()
         # print('players',games[0].players.all())
         participants = Participant.query.all()
-        print(participants)
+        print(participants[-1].game)
         return jsonify([{
             "game_id": g.id,
             "start_time": g.start_time,
@@ -114,8 +114,8 @@ class GameListAPI(Resource):
         user_id = request.args.get('user_id')
         game = Game()
         game.status_id = 0
-        addResult = db.session.add(game)
-        commitResult = db.session.commit()
+        db.session.add(game)
+        db.session.commit()
         # print(game, game.id, addResult, commitResult)
 
         participant = Participant()

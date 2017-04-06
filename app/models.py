@@ -33,7 +33,7 @@ class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     status_id = db.Column(db.Integer, db.ForeignKey('game_status.id'))
     start_time = db.Column(db.DateTime)
-    players = db.relationship('Participant', lazy='dynamic')
+    players = db.relationship('Participant', back_populates="game", lazy='dynamic')
 
     def __repr__(self):
         return '<Game %r>' % (self.id)
@@ -52,6 +52,8 @@ class Participant(db.Model):
     game_id = db.Column(db.Integer, db.ForeignKey('game.id'))
     playing = db.Column(db.Boolean)
     color = db.Column(db.Integer)
+    game = db.relationship("Game", back_populates="players")
+    # user = relationship("User", back_populates="")
 
     def __repr__(self):
         return '<Participant %r Game: %r User: %r' % (self.user_id, self.game_id, self.user.nickname)
