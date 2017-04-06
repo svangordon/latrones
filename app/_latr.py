@@ -9,6 +9,9 @@ import falcon
 from Resources import Game, User
 from db import cnx
 
+#!!!!: NB: This is the outdated Hug API, which I've deprecated in favor of
+# Flask. So there's not much reason to kep it around.
+
 # /user
 # POST /user?<username> Create user
 # GET  /user/{user_id} Get a given user object

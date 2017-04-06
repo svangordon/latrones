@@ -6,7 +6,8 @@ from db import cnx
 from pprint import pprint
 from random import shuffle
 
-
+# !!! NB: This is from before I discovered the excellent ORMs available, and therefore
+# is no longer needed.
 class Resource:
     def __init__(self, resource_id=None, options=None):
         if not options:

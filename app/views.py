@@ -1,20 +1,13 @@
 from flask import render_template, flash, redirect, request, jsonify, g
 from app import app, db
 from .forms import LoginForm
-from .models import User
+from .models import User, Game, Participant
 from flask_restful import Resource, Api, reqparse
 from flask_httpauth import HTTPBasicAuth
 
 api = Api(app)
 auth = HTTPBasicAuth()
 
-# @auth.get_password
-# def get_pw(nickname):
-#     u = User.query.filter_by(nickname=nickname)
-#     if u:
-#         print(u)
-#         return u.password
-#     return None
 @auth.verify_password
 def verify_password(nickname, password):
     user = User.query.filter_by(nickname = nickname).first()
@@ -50,8 +43,6 @@ class UserListAPI(Resource):
         print(respo)
         return 'user added'
 
-
-
 class UserAPI(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -83,29 +74,82 @@ class UserAPI(Resource):
         db.session.commit()
         return 'user deleted'
 
+class GameAPI(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        # self.reqparse.add_argument('user_id', type=int, required=True)
+        # self.reqparse.add_argument('email', type=str, location='json')
+        # self.reqparse.add_argument('nickname', type=str, location='json')
+        super(GameAPI, self).__init__()
+
+    def get(self, game_id):
+        game = Game.query.get(game_id)
+        print(game)
+        # return jsonify({'id': u.id, 'nickname': u.nickname, 'email': u.email})
+        return 'you got game {0}'.format(game.game_id)
+
+
+# responsible for getting a list of all games
+class GameListAPI(Resource):
+    def __init__(self):
+        super(GameListAPI, self).__init__()
+
+    def get(self):
+        games = Game.query.all()
+        print(games)
+        return jsonify([{"game_id":g.id, "start_time":g.start_time, "status_id":g.status_id} for g in games])
+
+    def post(self, user_id=None):
+        # self.reqparse = reqparse.RequestParser()
+        # self.reqparse.add_argument('user_id', type=str, required=True)
+        # args = self.reqparse.parse_args()
+        # print('q string', request.args.get('user_id'))
+        user_id = request.args.get('user_id')
+        game = Game()
+        game.status_id = 0
+        foo = db.session.add(game)
+        print('foo', foo)
+        db.session.commit()
+
+        participant = Participant()
+        participant.user_id = user_id
+        participant.game_id = foo
+        participant.color = -1
+        db.session.add(participant)
+        db.session.commit()
+        # print(new_game)
+        return 'foo'
+
+# Setup the API endpints, and connect them to the ORM wrappers
+api.add_resource(GameAPI, '/latr/api/v1.0/game/<game_id>', endpoint='game')
+api.add_resource(GameListAPI, '/latr/api/v1.0/games', endpoint='games')
 api.add_resource(UserListAPI, '/latr/api/v1.0/users', endpoint='users')
 api.add_resource(UserAPI, '/latr/api/v1.0/user/<user_id>', endpoint='user')
 
 @app.route('/')
 @app.route('/index')
-@auth.login_required
+# @auth.login_required
 def index():
-    user = {'nickname': 'Miguel'}
-    posts = [
-        {
-            'author': {'nickname': 'John'},
-            'body': 'Beautiful day in Portland!'
-        },
-        {
-            'author': {'nickname': 'Susan'},
-            'body': 'The Avengers movie was so cool!'
-        }
-    ]
-    return render_template('index.html',
-                           title='Home',
-                           user=user,
-                           posts=posts)
+    # user = {'nickname': 'Miguel'}
+    # posts = [
+    #     {
+    #         'author': {'nickname': 'John'},
+    #         'body': 'Beautiful day in Portland!'
+    #     },
+    #     {
+    #         'author': {'nickname': 'Susan'},
+    #         'body': 'The Avengers movie was so cool!'
+    #     }
+    # ]
+    return "Good boy"
+    # return render_template('index.html',
+    #                        title='Home',
+    #                        user=user,
+    #                        posts=posts)
 
+# @app.route('/latr/api/v1.0/games', methods=["GET"])
+# def butts():
+#     return 'you touched the butt'
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
