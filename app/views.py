@@ -98,12 +98,13 @@ class GameListAPI(Resource):
         games = Game.query.all()
         # print('players',games[0].players.all())
         participants = Participant.query.all()
-        print(participants[-1].game)
+        # print(participants[-1].user)
+        print(games[-1].players.all())
         return jsonify([{
             "game_id": g.id,
             "start_time": g.start_time,
             "status_id": g.status_id,
-            "players": [{"participant_id": p.id} for p in g.players.all()]
+            "players": [{"nickname": p.user.nickname, 'user_id': p.user.id} for p in g.players.all()]
         } for g in games])
 
     def post(self, user_id=None):
