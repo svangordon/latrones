@@ -88,6 +88,11 @@ class GameAPI(Resource):
         # return jsonify({'id': u.id, 'nickname': u.nickname, 'email': u.email})
         return 'you got game {0}'.format(game.game_id)
 
+    def delete(self, game_id):
+        game = Game.query.get(game_id)
+        db.session.delete(game)
+        db.session.commit()
+        return True
 
 # responsible for getting a list of all games
 class GameListAPI(Resource):
