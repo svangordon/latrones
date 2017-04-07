@@ -3,3 +3,5 @@
 app.db
 search.db
 flask
+
+./oauth_config.py

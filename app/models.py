@@ -1,7 +1,13 @@
-from app import db
+from app import db, lm
+from flask_login import UserMixin
 from passlib.apps import custom_app_context as pwd_context
 
-class User(db.Model):
+@lm.user_loader
+def load_user(id):
+    return User.query.get(int(id))
+
+class User(UserMixin, db.Model):
+    # __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
     nickname = db.Column(db.String(64), index=True, nullable=False, unique=True)
     email = db.Column(db.String(120), index=True, nullable=False, unique=True)
@@ -10,6 +16,21 @@ class User(db.Model):
     # posts = db.relationship('Post', backref='author', lazy='dynamic')
     participation = db.relationship('Participant', back_populates='user', lazy='dynamic')
     rating = db.Column(db.Integer)
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_active(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return str(self.id)
 
     def hash_password(self, password):
         self.password_hash = pwd_context.encrypt(password)

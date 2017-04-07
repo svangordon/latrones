@@ -1,20 +1,55 @@
-from flask import render_template, flash, redirect, request, jsonify, g
+from flask import render_template, flash, redirect, request, jsonify, g, session
 from app import app, db
 from .forms import LoginForm
 from .models import User, Game, Participant
 from flask_restful import Resource, Api, reqparse
 from flask_httpauth import HTTPBasicAuth
+from flask_oauthlib.client import OAuth
+from oauth_config import oauth_credentials
 
 api = Api(app)
 auth = HTTPBasicAuth()
 
-@auth.verify_password
-def verify_password(nickname, password):
-    user = User.query.filter_by(nickname = nickname).first()
-    if not user or not user.verify_password(password):
-        return False
-    g.user = user
-    return True
+oauth = OAuth()
+twitter = oauth.remote_app('twitter',
+    base_url='https://api.twitter.com/1/',
+    request_token_url='https://api.twitter.com/oauth/request_token',
+    access_token_url='https://api.twitter.com/oauth/access_token',
+    authorize_url='https://api.twitter.com/oauth/authenticate',
+    consumer_key=oauth_credentials["twitter"]["consumer_key"],
+    consumer_secret=oauth_credentials["twitter"]["consumer_secret"]
+)
+twitter_oauth = "twitter_oauthtok"
+
+@twitter.tokengetter
+def get_twitter_token():
+    if twitter_oauth in session:
+        resp = session[twitter_oauth]
+        return resp #resp['oauth_token'], resp['oauth_token_secret']
+
+@app.before_request
+def before_request():
+    g.user = None
+    if twitter_oauth in session:
+        print('oauth in session', session[twitter_oauth])
+        g.user = session[twitter_oauth]
+
+@app.route('/login')
+def login():
+    callback_url = 'http://localhost:5000/protected'#url_for('oauthorized', next=request.args.get('next'))
+    return twitter.authorize(callback=callback_url or request.referrer or None)
+
+@app.route('/logout')
+def logout():
+    session.pop(twitter_oauth, None)
+    return redirect(url_for('index'))
+
+@app.route('/protected')
+def protected():
+    print('hitting protectd route', g.user)
+    if g.user is None:
+        return "you are not authorized!!!"
+    return "you are authorized"
 
 class UserListAPI(Resource):
     """ Responsible for creating new users and, I guess, getting a list of all users """
@@ -166,17 +201,17 @@ def index():
 # def butts():
 #     return 'you touched the butt'
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        flash('Login requested for OpenID="%s", remember_me=%s' %
-              (form.openid.data, str(form.remember_me.data)))
-        return redirect('/index')
-    return render_template('login.html',
-                           title='Sign In',
-                           form=form,
-                           providers=app.config['OPENID_PROVIDERS'])
+# @app.route('/login', methods=['GET', 'POST'])
+# def login():
+#     form = LoginForm()
+#     if form.validate_on_submit():
+#         flash('Login requested for OpenID="%s", remember_me=%s' %
+#               (form.openid.data, str(form.remember_me.data)))
+#         return redirect('/index')
+#     return render_template('login.html',
+#                            title='Sign In',
+#                            form=form,
+#                            providers=app.config['OPENID_PROVIDERS'])
 
 # @app.route('/user', methods=['GET', 'POST'])
 # def user(user_id=None):
