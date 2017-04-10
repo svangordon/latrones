@@ -23,19 +23,31 @@ twitter_oauth = "twitter_oauthtok"
 
 @twitter.tokengetter
 def get_twitter_token():
+    print('trying to get token')
     if twitter_oauth in session:
         resp = session[twitter_oauth]
+        print('found twitter token, ==', resp)
         return resp #resp['oauth_token'], resp['oauth_token_secret']
 
 @app.before_request
 def before_request():
+    print('before request')
     g.user = None
     if twitter_oauth in session:
         print('oauth in session', session[twitter_oauth])
         g.user = session[twitter_oauth]
 
-@app.route('/login')
+@app.route('/login', methods=["POST"])
 def login():
+    print('request data', request.view_args, request.form)
+    form = request.form
+    # print('form.get', form['username'])
+    # return 'bang'
+    u = User.query.get(form['username'])
+    if not u:
+        return ("Could not login", 400)
+    print('u', u)
+    print('verify', u.verify_password(form['password']))
     callback_url = 'http://localhost:5000/protected'#url_for('oauthorized', next=request.args.get('next'))
     return twitter.authorize(callback=callback_url or request.referrer or None)
 
