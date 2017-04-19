@@ -9,6 +9,8 @@ CORS(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 lm = LoginManager(app)
+lm.session_protection = 'strong'
+# lm.login_view = 'auth.login' # Not sure what the redirect should be?
 
 from app import views, models
 

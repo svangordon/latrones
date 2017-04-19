@@ -6,6 +6,7 @@ from flask_restful import Resource, Api, reqparse
 from flask_httpauth import HTTPBasicAuth
 from flask_oauthlib.client import OAuth
 from oauth_config import oauth_credentials
+from flask_login import login_user
 
 api = Api(app)
 auth = HTTPBasicAuth()
@@ -37,8 +38,9 @@ def before_request():
         print('oauth in session', session[twitter_oauth])
         g.user = session[twitter_oauth]
 
-@app.route('/login', methods=["POST"])
+@app.route('/latr/api/v1.0/login', methods=["POST"])
 def login():
+    print('===== start =====')
     # print('request data', request.view_args, request.form)
     form = request.form
     # print('form.get', form['username'])
@@ -48,9 +50,16 @@ def login():
     # print(User.query.all())
     # print(u)
     if not u:
-        return ("Could not login", 400)
+        return ("Unknown user", 400)
+    if not u.verify_password(form['password']):
+        return ("Bad password", 400)
     print('u', u)
     print('verify', u.verify_password(form['password']))
+    login_user_result = login_user(u)
+    print('login_user_result', login_user_result)
+    return "user created"
+    # return "end"
+    # return login_user_result
     # callback_url = 'http://localhost:5000/protected'#url_for('oauthorized', next=request.args.get('next'))
     # return twitter.authorize(callback=callback_url or request.referrer or None)
 
