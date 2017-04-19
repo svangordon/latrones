@@ -36,6 +36,9 @@ class User(UserMixin, db.Model):
         self.password_hash = pwd_context.encrypt(password)
 
     def verify_password(self, password):
+        # !!!: Remember to change this so it doesn't bite you in the rear end
+        if self.password_hash is None:
+            return True
         return pwd_context.verify(password, self.password_hash)
 
     def __repr__(self):

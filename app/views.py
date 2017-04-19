@@ -31,7 +31,7 @@ def get_twitter_token():
 
 @app.before_request
 def before_request():
-    print('before request')
+    # print('before request')
     g.user = None
     if twitter_oauth in session:
         print('oauth in session', session[twitter_oauth])
@@ -39,16 +39,24 @@ def before_request():
 
 @app.route('/login', methods=["POST"])
 def login():
-    print('request data', request.view_args, request.form)
+    # print('request data', request.view_args, request.form)
     form = request.form
     # print('form.get', form['username'])
     # return 'bang'
-    u = User.query.get(form['username'])
+    # print('nick', User.query.filter_by(nickname=form["nickname"]).one())
+    u = User.query.filter_by(nickname=form['nickname']).one()
+    # print(User.query.all())
+    # print(u)
     if not u:
         return ("Could not login", 400)
     print('u', u)
     print('verify', u.verify_password(form['password']))
-    callback_url = 'http://localhost:5000/protected'#url_for('oauthorized', next=request.args.get('next'))
+    # callback_url = 'http://localhost:5000/protected'#url_for('oauthorized', next=request.args.get('next'))
+    # return twitter.authorize(callback=callback_url or request.referrer or None)
+
+@app.route('/loginTwitter', methods=["POST"])
+def login_twitter():
+    callback_url = 'http://localhost:3000/'#url_for('oauthorized', next=request.args.get('next'))
     return twitter.authorize(callback=callback_url or request.referrer or None)
 
 @app.route('/logout')
@@ -67,9 +75,9 @@ class UserListAPI(Resource):
     """ Responsible for creating new users and, I guess, getting a list of all users """
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('nickname', type=str, required=True, location='json')
-        self.reqparse.add_argument('email', type=str, required=True, location='json')
-        self.reqparse.add_argument('password', type=str, required=True, location='json')
+        self.reqparse.add_argument('nickname', type=str, required=True, location='form')
+        self.reqparse.add_argument('email', type=str, required=True, location='form')
+        self.reqparse.add_argument('password', type=str, required=True, location='form')
         super(UserListAPI, self).__init__()
 
     def get(self):
@@ -79,14 +87,15 @@ class UserListAPI(Resource):
     def post(self):
         """ Create user """
         args = self.reqparse.parse_args()
+        print("===============", args["nickname"], User.query.filter_by(nickname=args["nickname"]).first())
         if User.query.filter_by(nickname=args["nickname"]).first() is not None:
-            # print(User.query.filter_by(nickname=args["nickname"]))
+            print("user is not unique")
             return 400
         user = User(nickname=args["nickname"], email=args["email"])
         user.hash_password(args["password"])
         db.session.add(user)
         db.session.commit()
-        respo = User.query.filter(User.nickname == args["nickname"])
+        respo = User.query.filter(User.nickname == args["nickname"]).first()
         print(respo)
         return 'user added'
 
