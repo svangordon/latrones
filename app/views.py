@@ -128,6 +128,7 @@ class UserAPI(Resource):
         return jsonify({'id': u.id, 'nickname': u.nickname, 'email': u.email})
 
     def put(self, user_id):
+        """ Edit a user's record. """
         args = self.reqparse.parse_args()
         print('===', app.config['DEBUG'], '===')
         if not app.config['DEBUG']:
@@ -137,6 +138,18 @@ class UserAPI(Resource):
         u.email = args['email']
         db.session.commit()
         return jsonify({'id': u.id, 'nickname': u.nickname, 'email': u.email})
+
+    def post(self, user_id):
+        """ Read the user off the session, and return their own user object to them. """
+        print("beginning post")
+        if int(user_id) != 0:
+            return ("Bad request. Expected user_id == 0", 400) # just some error checking
+        try:
+            print("returning", session["user"])
+            return session["user"]
+        except KeyError:
+            print("no cookie found")
+            return {}
 
     def delete(self, user_id):
         args = self.reqparse.parse_args()
