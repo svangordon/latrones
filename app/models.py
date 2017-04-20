@@ -29,6 +29,14 @@ class User(UserMixin, db.Model):
     def is_anonymous(self):
         return False
 
+    @property
+    def json(self):
+        return {
+            "id": self.id,
+            "nickname": self.nickname,
+            "email": self.email
+        }
+
     def get_id(self):
         return str(self.id)
 

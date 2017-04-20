@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, request, jsonify, g, session
+from flask import render_template, flash, redirect, request, jsonify, g, session, make_response
 from app import app, db
 from .forms import LoginForm
 from .models import User, Game, Participant
@@ -32,7 +32,7 @@ def get_twitter_token():
 
 @app.before_request
 def before_request():
-    # print('before request')
+    print('before request', session)
     g.user = None
     if twitter_oauth in session:
         print('oauth in session', session[twitter_oauth])
@@ -57,8 +57,13 @@ def login():
     print('verify', u.verify_password(form['password']))
     login_user_result = login_user(u)
     print('login_user_result', login_user_result)
-    return "user created"
-    # return "end"
+    # return session
+    session["user"] = u.json
+    return jsonify(u.json)
+    # print('session', session)
+    # resp = make_response("good job")
+    # resp.set_cookie("dummy", "dummy_data")
+    # return resp
     # return login_user_result
     # callback_url = 'http://localhost:5000/protected'#url_for('oauthorized', next=request.args.get('next'))
     # return twitter.authorize(callback=callback_url or request.referrer or None)
@@ -73,9 +78,10 @@ def logout():
     session.pop(twitter_oauth, None)
     return redirect(url_for('index'))
 
-@app.route('/protected')
+@app.route('/protected', methods=["GET", "POST"])
 def protected():
     print('hitting protectd route', g.user)
+    print('session', session)
     if g.user is None:
         return "you are not authorized!!!"
     return "you are authorized"

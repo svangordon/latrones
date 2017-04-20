@@ -1,17 +1,17 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from config import basedir
+from config import basedir, SECRET_KEY
 from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 lm = LoginManager(app)
 lm.session_protection = 'strong'
 # lm.login_view = 'auth.login' # Not sure what the redirect should be?
-
+app.secret_key = SECRET_KEY
 from app import views, models
 
 # from flask import Flask
