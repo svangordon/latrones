@@ -148,9 +148,8 @@ class UserAPI(Resource):
         try:
             u = User.query.get(session["user"]["id"])
             print("returning", u)
-            u.set_gravatar()
             return u.json
-        except KeyError:
+        except (KeyError, AttributeError):
             return None
 
     def delete(self, user_id):
