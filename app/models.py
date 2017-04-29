@@ -1,6 +1,9 @@
+# -*- coding: utf-8 -*-
+
 from app import db, lm
 from flask_login import UserMixin
 from passlib.apps import custom_app_context as pwd_context
+import urllib, hashlib
 
 @lm.user_loader
 def load_user(id):
@@ -15,6 +18,7 @@ class User(UserMixin, db.Model):
     social_id = db.Column(db.String(64), nullable=True)
     # posts = db.relationship('Post', backref='author', lazy='dynamic')
     participation = db.relationship('Participant', back_populates='user', lazy='dynamic')
+    avatar = db.Column(db.String(128), index=True)
     rating = db.Column(db.Integer)
 
     @property
@@ -34,8 +38,23 @@ class User(UserMixin, db.Model):
         return {
             "id": self.id,
             "nickname": self.nickname,
-            "email": self.email
+            "email": self.email,
+            "avatar": self.avatar,
+            "rating": self.rating
         }
+
+    def set_gravatar(self):
+        # Set your variables here
+        email = self.email.encode()
+        default = "https://www.example.com/default.jpg"
+        size = 40
+
+        # construct the url
+        gravatar_url = "https://www.gravatar.com/avatar/" + hashlib.md5(email.lower()).hexdigest() + "?"
+        # gravatar_url += urllib.urlencode({'d':default, 's':str(size)})
+        gravatar_url += "d=retro"
+        self.avatar = gravatar_url
+        print('setting gravatar to ', gravatar_url)
 
     def get_id(self):
         return str(self.id)

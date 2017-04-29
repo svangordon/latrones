@@ -108,11 +108,12 @@ class UserListAPI(Resource):
             return 400
         user = User(nickname=args["nickname"], email=args["email"])
         user.hash_password(args["password"])
+        user.set_gravatar()
         db.session.add(user)
         db.session.commit()
         respo = User.query.filter(User.nickname == args["nickname"]).first()
         print(respo)
-        return 'user added'
+        return user.json
 
 class UserAPI(Resource):
     def __init__(self):
@@ -145,11 +146,12 @@ class UserAPI(Resource):
         if int(user_id) != 0:
             return ("Bad request. Expected user_id == 0", 400) # just some error checking
         try:
-            print("returning", session["user"])
-            return session["user"]
+            u = User.query.get(session["user"]["id"])
+            print("returning", u)
+            u.set_gravatar()
+            return u.json
         except KeyError:
-            print("no cookie found")
-            return {}
+            return None
 
     def delete(self, user_id):
         args = self.reqparse.parse_args()
