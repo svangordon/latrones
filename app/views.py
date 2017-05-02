@@ -198,16 +198,30 @@ class GameListAPI(Resource):
         } for g in games])
 
     def post(self, user_id=None):
+        """ To become the matchmaking route. """
         # self.reqparse = reqparse.RequestParser()
         # self.reqparse.add_argument('user_id', type=str, required=True)
         # args = self.reqparse.parse_args()
         # print('q string', request.args.get('user_id'))
-        user_id = request.args.get('user_id')
-        game = Game()
-        game.status_id = 0
-        db.session.add(game)
-        db.session.commit()
-        # print(game, game.id, addResult, commitResult)
+
+        # #
+        # print(Game.query.first().players.all())
+        # games = Game.query.filter(db.session.query.get(Game.id).players.all().count() == 1).all()
+        # print(db.func.count(1))
+        # games = Game.query.filter(db.func.count(1) == 1).all()
+        games = db.session.query(Game).join(Participant).group_by(Game).having(db.func.count(Participant.id) < 2).all()
+        # print("games", len(games))
+        user_id = session["user"]["id"]
+        game = None
+        if len(games) == 0:
+            """ No open games, so open one"""
+            game = Game()
+            game.status_id = 0
+            db.session.add(game)
+            db.session.commit()
+            # print(game, game.id, addResult, commitResult)
+        else:
+            game = games[0]
 
         participant = Participant()
         participant.user_id = user_id
@@ -215,8 +229,13 @@ class GameListAPI(Resource):
         participant.color = -1
         db.session.add(participant)
         db.session.commit()
-        # print(new_game)
-        return 'foo'
+
+        return jsonify({
+            "game_id": game.id,
+            "start_time": game.start_time,
+            "status_id": game.status_id,
+            "players": [{"nickname": p.user.nickname, 'user_id': p.user.id} for p in game.players.all()]
+        })
 
 # Setup the API endpints, and connect them to the ORM wrappers
 api.add_resource(GameAPI, '/latr/api/v1.0/game/<game_id>', endpoint='game')
