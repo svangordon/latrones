@@ -7,6 +7,7 @@ from flask_httpauth import HTTPBasicAuth
 from flask_oauthlib.client import OAuth
 from oauth_config import oauth_credentials
 from flask_login import login_user
+from random import randrange
 
 api = Api(app)
 auth = HTTPBasicAuth()
@@ -197,6 +198,12 @@ class GameListAPI(Resource):
             "players": [{"nickname": p.user.nickname, 'user_id': p.user.id} for p in g.players.all()]
         } for g in games])
 
+    def start_game(self, game):
+        print('starting game', game)
+        print('participants', game.players.all())
+        player_color = randrange(2)
+        opponent_color = 1 - player_color
+
     def post(self, user_id=None):
         """ To become the matchmaking route. """
         # self.reqparse = reqparse.RequestParser()
@@ -209,26 +216,42 @@ class GameListAPI(Resource):
         # games = Game.query.filter(db.session.query.get(Game.id).players.all().count() == 1).all()
         # print(db.func.count(1))
         # games = Game.query.filter(db.func.count(1) == 1).all()
-        games = db.session.query(Game).join(Participant).group_by(Game).having(db.func.count(Participant.id) < 2).all()
-        # print("games", len(games))
         user_id = session["user"]["id"]
+        # check to make sure user doesn't have a game already open
+        open_game = db.session.query(Game)\
+            .join(Participant)\
+            .group_by(Game)\
+            .filter(Game.players.any() == user_id)\
+            .first()
+        if open_game:
+            print('returning open game')
+            print(open_game.rules.initial_fen)
+            return open_game.json
+
+        games = db.session.query(Game)\
+            .join(Participant)\
+            .group_by(Game)\
+            .having(db.func.count(Participant.id) < 2)\
+            .filter(Game.players.any() != user_id)\
+            .all()
+        print("games", games)
         game = None
         if len(games) == 0:
             """ No open games, so open one"""
+            print('creating game')
             game = Game()
-            game.status_id = 0
+            game.status_id = 1
+            game.game_rule_id = 1
             db.session.add(game)
             db.session.commit()
             # print(game, game.id, addResult, commitResult)
         else:
             game = games[0]
 
-        participant = Participant()
-        participant.user_id = user_id
-        participant.game_id = game.id
-        participant.color = -1
-        db.session.add(participant)
-        db.session.commit()
+        game.add_participant(user_id)
+
+        if len(game.players.all()) == 2:
+            game.start_game()
 
         return jsonify({
             "game_id": game.id,

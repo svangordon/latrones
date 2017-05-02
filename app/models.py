@@ -4,6 +4,7 @@ from app import db, lm
 from flask_login import UserMixin
 from passlib.apps import custom_app_context as pwd_context
 import urllib, hashlib
+from flask import jsonify
 
 @lm.user_loader
 def load_user(id):
@@ -85,9 +86,33 @@ class Game(db.Model):
     status_id = db.Column(db.Integer, db.ForeignKey('game_status.id'))
     start_time = db.Column(db.DateTime)
     players = db.relationship('Participant', back_populates="game", lazy='dynamic')
+    moves = db.relationship('Move')
+    rules = db.relationship('GameRule')
+    game_rule_id = db.Column(db.Integer, db.ForeignKey('game_rule.id'))
+
 
     def __repr__(self):
         return '<Game %r>' % (self.id)
+
+    @property
+    def json(self):
+        return jsonify({
+            "game_id": self.id,
+            "start_time": self.start_time,
+            "status_id": self.status_id,
+            "players": [{"nickname": p.user.nickname, 'user_id': p.user.id} for p in self.players.all()]
+        })
+
+    def add_participant(self, user_id):
+        participant = Participant()
+        participant.user_id = user_id
+        participant.game_id = self.id
+        participant.color = -1
+        db.session.add(participant)
+        db.session.commit()
+
+    def start_game(self):
+        move = Move()
 
 class GameStatus(db.Model):
     __tablename__ = 'game_status'
@@ -116,6 +141,7 @@ class GameRule(db.Model):
     width = db.Column(db.Integer)
     height = db.Column(db.Integer)
     capture_method_id = db.Column(db.Integer, db.ForeignKey('capture_method.id'))
+    initial_fen = db.Column(db.String(256))
     # capture_method = db.relationship('CaptureMethod', lazy='dynamic')
 
     def __repr__(self):
@@ -132,6 +158,7 @@ class CaptureMethod(db.Model):
 class Move(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # participant_id = db.Column(db.Integer, db.ForeignKey('participant.id')) # we can figure this out from the game_piece
+    game_id = db.Column(db.Integer, db.ForeignKey('game.id'))
     piece_id = db.Column(db.Integer, db.ForeignKey('game_piece.id'))
     origin = db.Column(db.Integer)
     destination = db.Column(db.Integer)
