@@ -89,7 +89,7 @@ class Game(db.Model):
     moves = db.relationship('Move')
     rules = db.relationship('GameRule')
     game_rule_id = db.Column(db.Integer, db.ForeignKey('game_rule.id'))
-
+    pgn = db.Column(db.String(1024))
 
     def __repr__(self):
         return '<Game %r>' % (self.id)
@@ -112,7 +112,27 @@ class Game(db.Model):
         db.session.commit()
 
     def start_game(self):
-        move = Move()
+        player_1_color = randrange(2)
+        player_2_color = 1 - player_1_color
+        self.players[0].color = player_1_color
+        self.players[1].color = player_2_color
+        db.session.commit()
+
+    def delete_game(self):
+        gotten_game = self.query.get(self.id)
+        print('trying to delete', gotten_game)
+        db.session.delete(gotten_game)
+        db.session.commit()
+
+    @property
+    def pgn(self):
+        player_1_tag = '[' + '"' + ('White' if self.players[0].color == 0 else 'Black') + self.players[0].nickname + ']'
+        player_2_tag = '[' + '"' + ('White' if self.players[1].color == 0 else 'Black') + self.players[1].nickname + ']'
+        header = player_1_tag + '\n' + player_2_tag
+
+        # TODO: Figure this out
+        body = self.moves
+        return header + '\n' + body
 
 class GameStatus(db.Model):
     __tablename__ = 'game_status'

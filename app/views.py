@@ -180,7 +180,7 @@ class GameAPI(Resource):
         db.session.commit()
         return True
 
-# responsible for getting a list of all games
+# responsible for getting a list of all games and creating new games
 class GameListAPI(Resource):
     def __init__(self):
         super(GameListAPI, self).__init__()
@@ -225,9 +225,11 @@ class GameListAPI(Resource):
             .first()
         if open_game:
             print('returning open game')
-            print(open_game.rules.initial_fen)
-            return open_game.json
+            print(open_game)
+            open_game.delete_game()
+            # return open_game.json
 
+        # return "hiya"
         games = db.session.query(Game)\
             .join(Participant)\
             .group_by(Game)\
